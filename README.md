@@ -1,4 +1,10 @@
-dthree.js
-=========
+# dthree.js
 
 datavis tests with d3.js and three.js
+
+## Install
+
+    bower install
+
+
+
