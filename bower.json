@@ -15,6 +15,6 @@
   ],
   "dependencies": {
     "d3": "~3.4.8",
-    "three.js": "*"
+    "threex.windowresize": "*"
   }
 }
