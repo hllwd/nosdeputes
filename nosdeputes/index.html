@@ -62,9 +62,9 @@
             // scale for y length
             var scaleYSortAttribute = d3.scale.linear()
                     .domain(d3.extent(deputes, function (d) {
-                        return d[sortAttribute];
+                        return parseInt(d[sortAttribute]);
                     }))
-                    .rangeRound([0, 150]);
+                    .rangeRound([0, 100]);
             // indexes for assembly loop
             var iCol = 0;
             var iLine = 0;
@@ -168,6 +168,11 @@
             light.position.set(0, 250, 0);
             scene.add(light);
 
+            // light
+            light = new th.PointLight(0xffffff);
+            light.position.set(0, -250, 0);
+            scene.add(light);
+
             for (iLine = 0; iLine < maxLine; iLine += 1) {
                 for (iCol = 0; iCol < maxCol; iCol += 1) {
                     currentIndice = iLine * maxCol + iCol;
@@ -190,23 +195,8 @@
             }
 
             // axes
-            axes = new th.AxisHelper(200);
+            axes = new th.AxisHelper(100);
             scene.add(axes);
-
-            // floor
-            floorTexture = new th.ImageUtils.loadTexture('img/checkerboard.jpg');
-            floorTexture.wrapS = floorTexture.wrapT = th.RepeatWrapping;
-            floorTexture.repeat.set(10, 10);
-            // double side
-            floorMaterial = new th.MeshBasicMaterial({
-                color: 0xDEB887,
-                side: th.DoubleSide
-            });
-            floorGeometry = new th.PlaneGeometry(1000, 1000, 1, 1);
-            floor = new th.Mesh(floorGeometry, floorMaterial);
-            floor.position.y = -.5;
-            floor.rotation.x = Math.PI / 2;
-            scene.add(floor);
 
             // sky
             // ! make sure the camera's far is big enough to render the sky
@@ -239,7 +229,7 @@
         d3.json('nosdeputes.fr_synthese_2014-07-04.json', setup);
 
 
-    }(d3, THREE, THREEx, window, 'semaines_presence');
+    }(d3, THREE, THREEx, window, 'commission_interventions');
 
 
 </script>
