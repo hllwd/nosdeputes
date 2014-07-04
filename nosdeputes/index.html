@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>hello world</title>
+    <meta charset="utf-8"/>
+
+    <title>Nos députes</title>
 
     <style>
         body {
@@ -17,7 +19,10 @@
 </head>
 <body>
 
+<script src="../bower_components/jquery/dist/jquery.min.js"></script>
+
 <script src="../bower_components/d3/d3.min.js"></script>
+
 <script src="../other_components/Three/three.min.js"></script>
 <script src="../other_components/Detector/Detector.js"></script>
 <script src="../other_components/THREEx.FullScreen/THREEx.FullScreen.js"></script>
@@ -28,208 +33,231 @@
 
 <script>
 
-    !function (d3, th, thx, win, sortAttribute) {
+!function (d3, th, thx, win, sortAttribute) {
 
-        var container, scene, camera, renderer, controls;
+    var container, scene, camera, renderer, controls, mouse, projector;
+    var targetList = new Array();
 
 
-        function setup(dataDeputes) {
+    function setup(dataDeputes) {
 
-            // width
-            var w = win.innerWidth;
-            // height
-            var h = win.innerHeight;
-            var viewAngle = 45;
-            var aspect = w / h;
-            var near = 0.1;
-            var far = 20000;
-            var light;
-            var sphereGeometry;
-            var sphereMaterial;
-            var sphere;
-            var axes;
-            var floorTexture;
-            var floorMaterial;
-            var floorGeometry;
-            var floor;
-            var skyBoxGeometry;
-            var skyBoxMaterial;
-            var skyBox;
-            // data
-            var deputes = dataDeputes.deputes.map(function(d){
-                return d.depute;
-            });
-            // scale for y length
-            var scaleYSortAttribute = d3.scale.linear()
-                    .domain(d3.extent(deputes, function (d) {
-                        return parseInt(d[sortAttribute]);
-                    }))
-                    .rangeRound([0, 100]);
-            // indexes for assembly loop
-            var iCol = 0;
-            var iLine = 0;
-            // maxs for assembly loop : 58 * 10
-            var maxCol = 10;
-            var maxLine = 58;
-            // radius
-            var minRadius = 150;
-            var maxRadius = 300;
-            // scale radius
-            var scaleRadius = d3.scale.linear()
-                    .domain([0, maxCol])
-                    .rangeRound([minRadius, maxRadius]);
-            // angle
-            var minAngle = -Math.PI / 2;
-            var maxAngle = Math.PI / 2;
-            // scale angle
-            var scaleAngle = d3.scale.linear()
-                    .domain([0, maxLine])
-                    .range([minAngle, maxAngle]);
-            // size box
-            var sizeBox = 7;
-            // loop var
-            var currentIndice = 0;
-            var currentDepute;
-            var currentY = 0;
-            var currentLine;
-            var currentCol;
-            var currentPoint;
-            var currentGeometry;
-            var currentMaterial;
-            var currentCube;
-            // colors
-            var colors = {
-                ECOLO: 0x00CC00
-                , GDR: 0xFF0033
-                , NI: 0x0000A3
-                , RRDP: 0xFF0033
-                , SRC: 0xFF33CC
-                , UDI: 0x00B3FF
-                , UMP: 0x0033FF
-            };
-            // positions for sort
-            var positions = {
-                ECOLO: 1
-                , GDR: 0
-                , NI: 6
-                , RRDP: 2
-                , SRC: 3
-                , UDI: 4
-                , UMP: 5 }
+        // width
+        var w = win.innerWidth;
+        // height
+        var h = win.innerHeight;
+        var viewAngle = 45;
+        var aspect = w / h;
+        var near = 0.1;
+        var far = 20000;
+        var light;
+        var sphereGeometry;
+        var sphereMaterial;
+        var sphere;
+        var axes;
+        var floorTexture;
+        var floorMaterial;
+        var floorGeometry;
+        var floor;
+        var skyBoxGeometry;
+        var skyBoxMaterial;
+        var skyBox;
+        // data
+        var deputes = dataDeputes.deputes.map(function (d) {
+            return d.depute;
+        });
+        // scale for y length
+        var scaleYSortAttribute = d3.scale.linear()
+                .domain(d3.extent(deputes, function (d) {
+                    return parseInt(d[sortAttribute]);
+                }))
+                .rangeRound([0, 100]);
+        // indexes for assembly loop
+        var iCol = 0;
+        var iLine = 0;
+        // maxs for assembly loop : 58 * 10
+        var maxCol = 10;
+        var maxLine = 58;
+        // radius
+        var minRadius = 150;
+        var maxRadius = 300;
+        // scale radius
+        var scaleRadius = d3.scale.linear()
+                .domain([0, maxCol])
+                .rangeRound([minRadius, maxRadius]);
+        // angle
+        var minAngle = -Math.PI / 2;
+        var maxAngle = Math.PI / 2;
+        // scale angle
+        var scaleAngle = d3.scale.linear()
+                .domain([0, maxLine])
+                .range([minAngle, maxAngle]);
+        // size box
+        var sizeBox = 7;
+        // loop var
+        var currentIndice = 0;
+        var currentDepute;
+        var currentY = 0;
+        var currentLine;
+        var currentCol;
+        var currentPoint;
+        var currentGeometry;
+        var currentMaterial;
+        var currentCube;
+        // colors
+        var colors = {
+            ECOLO: 0x00CC00, GDR: 0xFF0033, NI: 0x0000A3, RRDP: 0xFF0033, SRC: 0xFF33CC, UDI: 0x00B3FF, UMP: 0x0033FF
+        };
+        // positions for sort
+        var positions = {
+            ECOLO: 1, GDR: 0, NI: 6, RRDP: 2, SRC: 3, UDI: 4, UMP: 5 };
+        // target list for mouse interception
 
-            // we sort deputes
-            deputes.sort(function (a, b) {
-                if(a.groupe_sigle !== b.groupe_sigle){
-                    return positions[a.groupe_sigle] - positions[b.groupe_sigle];
-                }
-                return a[sortAttribute] - b[sortAttribute];
-            });
-
-            // scene
-            scene = new th.Scene();
-
-            // camera
-            camera = new th.PerspectiveCamera(viewAngle, aspect, near, far);
-            // add the camera to the scene at the default position (0,0,0)
-            scene.add(camera);
-            // so pull it back (z = 400) and up (y = 100)
-            camera.position.set(0, 100, 400);
-            // and set the angle towards the scene origin
-            camera.lookAt(scene.position);
-
-            // renderer
-            if (Detector.webgl) {
-                renderer = new th.WebGLRenderer({
-                    antialias: true
-                });
-            } else {
-                renderer = new th.CanvasRenderer();
+        // we sort deputes
+        deputes.sort(function (a, b) {
+            if (a.groupe_sigle !== b.groupe_sigle) {
+                return positions[a.groupe_sigle] - positions[b.groupe_sigle];
             }
-            renderer.setSize(w, h);
+            return a[sortAttribute] - b[sortAttribute];
+        });
 
-            // container
-            container = document.getElementById('container');
-            // attach renderer to the container
-            container.appendChild(renderer.domElement);
+        // scene
+        scene = new th.Scene();
 
-            // events
-            // automatically resize renderer
-            thx.WindowResize(renderer, camera);
-            // toggle full screen on given key-press
-            thx.FullScreen.bindKey({
-                charCode: 'm'.charCodeAt(0)
+        // camera
+        camera = new th.PerspectiveCamera(viewAngle, aspect, near, far);
+        // add the camera to the scene at the default position (0,0,0)
+        scene.add(camera);
+        // so pull it back (z = 400) and up (y = 100)
+        camera.position.set(0, 100, 400);
+        // and set the angle towards the scene origin
+        camera.lookAt(scene.position);
+
+        // renderer
+        if (Detector.webgl) {
+            renderer = new th.WebGLRenderer({
+                antialias: true
             });
+        } else {
+            renderer = new th.CanvasRenderer();
+        }
+        renderer.setSize(w, h);
 
-            // controls
-            controls = new th.OrbitControls(camera, renderer.domElement);
+        // container
+        container = document.getElementById('container');
+        // attach renderer to the container
+        container.appendChild(renderer.domElement);
 
-            // light
-            light = new th.PointLight(0xffffff);
-            light.position.set(0, 250, 0);
-            scene.add(light);
+        // events
+        // automatically resize renderer
+        thx.WindowResize(renderer, camera);
+        // toggle full screen on given key-press
+        thx.FullScreen.bindKey({
+            charCode: 'm'.charCodeAt(0)
+        });
 
-            // light
-            light = new th.PointLight(0xffffff);
-            light.position.set(0, -250, 0);
-            scene.add(light);
+        // controls
+        controls = new th.OrbitControls(camera, renderer.domElement);
 
-            for (iLine = 0; iLine < maxLine; iLine += 1) {
-                for (iCol = 0; iCol < maxCol; iCol += 1) {
-                    currentIndice = iLine * maxCol + iCol;
-                    if (currentIndice < deputes.length) {
-                        currentDepute = deputes[currentIndice];
-                        currentY = scaleYSortAttribute(currentDepute[sortAttribute]);
-                        currentCol = scaleRadius(iCol);
-                        currentLine = scaleAngle(iLine);
-                        currentPoint = [
-                            Math.cos(currentLine) * currentCol,
-                            Math.sin(currentLine) * currentCol
-                        ];
-                        currentGeometry = new th.BoxGeometry(sizeBox, currentY, sizeBox);
-                        currentMaterial = new th.MeshLambertMaterial({ color: colors[currentDepute.groupe_sigle] })
-                        currentCube = new th.Mesh(currentGeometry, currentMaterial);
-                        currentCube.position.set(currentPoint[0], 1 + currentY / 2, currentPoint[1]);
-                        scene.add(currentCube);
-                    }
+        // light
+        light = new th.PointLight(0xffffff);
+        light.position.set(0, 250, 0);
+        scene.add(light);
+
+        // light
+        light = new th.PointLight(0xffffff);
+        light.position.set(0, -250, 0);
+        scene.add(light);
+
+        for (iLine = 0; iLine < maxLine; iLine += 1) {
+            for (iCol = 0; iCol < maxCol; iCol += 1) {
+                currentIndice = iLine * maxCol + iCol;
+                if (currentIndice < deputes.length) {
+                    currentDepute = deputes[currentIndice];
+                    currentY = scaleYSortAttribute(currentDepute[sortAttribute]);
+                    currentCol = scaleRadius(iCol);
+                    currentLine = scaleAngle(iLine);
+                    currentPoint = [
+                        Math.cos(currentLine) * currentCol,
+                        Math.sin(currentLine) * currentCol
+                    ];
+                    currentGeometry = new th.BoxGeometry(sizeBox, currentY, sizeBox);
+                    currentMaterial = new th.MeshLambertMaterial({ color: colors[currentDepute.groupe_sigle] })
+                    currentCube = new th.Mesh(currentGeometry, currentMaterial);
+                    currentCube.position.set(currentPoint[0], 1 + currentY / 2, currentPoint[1]);
+                    currentCube.userData.depute = currentDepute;
+                    scene.add(currentCube);
+                    // for intersection purpose
+                    targetList.push(currentCube);
                 }
             }
+        }
 
-            // axes
-            axes = new th.AxisHelper(100);
-            scene.add(axes);
+        // axes
+        axes = new th.AxisHelper(100);
+        scene.add(axes);
 
-            // sky
-            // ! make sure the camera's far is big enough to render the sky
-            skyBoxGeometry = new th.BoxGeometry(10000, 10000, 10000);
-            skyBoxMaterial = new th.MeshBasicMaterial({
-                color: 0xffffff,
-                side: th.BackSide
-            });
-            skyBox = new th.Mesh(skyBoxGeometry, skyBoxMaterial);
-            scene.add(skyBox);
+        // sky
+        // ! make sure the camera's far is big enough to render the sky
+        skyBoxGeometry = new th.BoxGeometry(10000, 10000, 10000);
+        skyBoxMaterial = new th.MeshBasicMaterial({
+            color: 0xffffff,
+            side: th.BackSide
+        });
+        skyBox = new th.Mesh(skyBoxGeometry, skyBoxMaterial);
+        scene.add(skyBox);
 
-            animate();
+        // projector
+        projector = new th.Projector();
 
+        win.addEventListener('click', onMouseClick, false);
+
+        animate();
+
+    };
+
+    function animate() {
+        requestAnimationFrame(animate);
+        render();
+        update();
+    };
+
+    function update() {
+        controls.update();
+    };
+
+    function render() {
+        renderer.render(scene, camera);
+    };
+
+    function onMouseClick(event) {
+        var vector, ray, intersects;
+
+        // retrive mouse position
+        mouse = {
+            x: ( event.clientX / window.innerWidth ) * 2 - 1,
+            y: - ( event.clientY / window.innerHeight ) * 2 + 1
         };
 
-        function animate() {
-            requestAnimationFrame(animate);
-            render();
-            update();
-        };
+        // create a ray with origin at the mouse position
+        // and direction into the scene (camera direction)
+        vector = new th.Vector3(mouse.x, mouse.y, 1);
+        projector.unprojectVector(vector, camera);
+        ray = new th.Raycaster(camera.position, vector.sub(camera.position).normalize());
 
-        function update() {
-            controls.update();
-        };
+        // create an array containing all abjects in the scene with wich the ray intersects
+        intersects = ray.intersectObjects(targetList);
 
-        function render() {
-            renderer.render(scene, camera);
-        };
+        // if there is one or more intersections
+        if (intersects.length > 0) {
+            console.log(intersects[0].object.userData.depute);
+        }
 
-        d3.json('nosdeputes.fr_synthese_2014-07-04.json', setup);
+    };
+
+    d3.json('nosdeputes.fr_synthese_2014-07-04.json', setup);
 
 
-    }(d3, THREE, THREEx, window, 'commission_interventions');
+}(d3, THREE, THREEx, window, 'hemicycle_interventions');
 
 
 </script>
