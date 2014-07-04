@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>hello world</title>
+
+    <style>
+        body {
+            margin: 0;
+        }
+
+        /* reset */
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+    </style>
+</head>
+<body>
+
+<script src="../bower_components/d3/d3.min.js"></script>
+<script src="../other_components/Three/three.min.js"></script>
+<script src="../other_components/Detector/Detector.js"></script>
+<script src="../other_components/THREEx.FullScreen/THREEx.FullScreen.js"></script>
+<script src="../bower_components/threex.windowresize/threex.windowresize.js"></script>
+<script src="../other_components/OrbitControls/OrbitControls.js"></script>
+
+<div id="container" style="z-index: 1; position: absolute; left:0px; top:0px"></div>
+
+<script>
+
+    !function (d3, th, thx, win, sortAttribute) {
+
+        var container, scene, camera, renderer, controls;
+
+
+        function setup(dataDeputes) {
+
+            // width
+            var w = win.innerWidth;
+            // height
+            var h = win.innerHeight;
+            var viewAngle = 45;
+            var aspect = w / h;
+            var near = 0.1;
+            var far = 20000;
+            var light;
+            var sphereGeometry;
+            var sphereMaterial;
+            var sphere;
+            var axes;
+            var floorTexture;
+            var floorMaterial;
+            var floorGeometry;
+            var floor;
+            var skyBoxGeometry;
+            var skyBoxMaterial;
+            var skyBox;
+            // data
+            var deputes = dataDeputes.deputes.map(function(d){
+                return d.depute;
+            });
+            // scale for y length
+            var scaleYSortAttribute = d3.scale.linear()
+                    .domain(d3.extent(deputes, function (d) {
+                        return d[sortAttribute];
+                    }))
+                    .rangeRound([0, 150]);
+            // indexes for assembly loop
+            var iCol = 0;
+            var iLine = 0;
+            // maxs for assembly loop : 58 * 10
+            var maxCol = 10;
+            var maxLine = 58;
+            // radius
+            var minRadius = 150;
+            var maxRadius = 300;
+            // scale radius
+            var scaleRadius = d3.scale.linear()
+                    .domain([0, maxCol])
+                    .rangeRound([minRadius, maxRadius]);
+            // angle
+            var minAngle = -Math.PI / 2;
+            var maxAngle = Math.PI / 2;
+            // scale angle
+            var scaleAngle = d3.scale.linear()
+                    .domain([0, maxLine])
+                    .range([minAngle, maxAngle]);
+            // size box
+            var sizeBox = 7;
+            // loop var
+            var currentIndice = 0;
+            var currentDepute;
+            var currentY = 0;
+            var currentLine;
+            var currentCol;
+            var currentPoint;
+            var currentGeometry;
+            var currentMaterial;
+            var currentCube;
+            // colors
+            var colors = {
+                ECOLO: 0x00CC00
+                , GDR: 0xFF0033
+                , NI: 0x0000A3
+                , RRDP: 0xFF0033
+                , SRC: 0xFF33CC
+                , UDI: 0x00B3FF
+                , UMP: 0x0033FF
+            };
+            // positions for sort
+            var positions = {
+                ECOLO: 1
+                , GDR: 0
+                , NI: 6
+                , RRDP: 2
+                , SRC: 3
+                , UDI: 4
+                , UMP: 5 }
+
+            // we sort deputes
+            deputes.sort(function (a, b) {
+                if(a.groupe_sigle !== b.groupe_sigle){
+                    return positions[a.groupe_sigle] - positions[b.groupe_sigle];
+                }
+                return a[sortAttribute] - b[sortAttribute];
+            });
+
+            // scene
+            scene = new th.Scene();
+
+            // camera
+            camera = new th.PerspectiveCamera(viewAngle, aspect, near, far);
+            // add the camera to the scene at the default position (0,0,0)
+            scene.add(camera);
+            // so pull it back (z = 400) and up (y = 100)
+            camera.position.set(0, 100, 400);
+            // and set the angle towards the scene origin
+            camera.lookAt(scene.position);
+
+            // renderer
+            if (Detector.webgl) {
+                renderer = new th.WebGLRenderer({
+                    antialias: true
+                });
+            } else {
+                renderer = new th.CanvasRenderer();
+            }
+            renderer.setSize(w, h);
+
+            // container
+            container = document.getElementById('container');
+            // attach renderer to the container
+            container.appendChild(renderer.domElement);
+
+            // events
+            // automatically resize renderer
+            thx.WindowResize(renderer, camera);
+            // toggle full screen on given key-press
+            thx.FullScreen.bindKey({
+                charCode: 'm'.charCodeAt(0)
+            });
+
+            // controls
+            controls = new th.OrbitControls(camera, renderer.domElement);
+
+            // light
+            light = new th.PointLight(0xffffff);
+            light.position.set(0, 250, 0);
+            scene.add(light);
+
+            for (iLine = 0; iLine < maxLine; iLine += 1) {
+                for (iCol = 0; iCol < maxCol; iCol += 1) {
+                    currentIndice = iLine * maxCol + iCol;
+                    if (currentIndice < deputes.length) {
+                        currentDepute = deputes[currentIndice];
+                        currentY = scaleYSortAttribute(currentDepute[sortAttribute]);
+                        currentCol = scaleRadius(iCol);
+                        currentLine = scaleAngle(iLine);
+                        currentPoint = [
+                            Math.cos(currentLine) * currentCol,
+                            Math.sin(currentLine) * currentCol
+                        ];
+                        currentGeometry = new th.BoxGeometry(sizeBox, currentY, sizeBox);
+                        currentMaterial = new th.MeshLambertMaterial({ color: colors[currentDepute.groupe_sigle] })
+                        currentCube = new th.Mesh(currentGeometry, currentMaterial);
+                        currentCube.position.set(currentPoint[0], 1 + currentY / 2, currentPoint[1]);
+                        scene.add(currentCube);
+                    }
+                }
+            }
+
+            // axes
+            axes = new th.AxisHelper(200);
+            scene.add(axes);
+
+            // floor
+            floorTexture = new th.ImageUtils.loadTexture('img/checkerboard.jpg');
+            floorTexture.wrapS = floorTexture.wrapT = th.RepeatWrapping;
+            floorTexture.repeat.set(10, 10);
+            // double side
+            floorMaterial = new th.MeshBasicMaterial({
+                color: 0xDEB887,
+                side: th.DoubleSide
+            });
+            floorGeometry = new th.PlaneGeometry(1000, 1000, 1, 1);
+            floor = new th.Mesh(floorGeometry, floorMaterial);
+            floor.position.y = -.5;
+            floor.rotation.x = Math.PI / 2;
+            scene.add(floor);
+
+            // sky
+            // ! make sure the camera's far is big enough to render the sky
+            skyBoxGeometry = new th.BoxGeometry(10000, 10000, 10000);
+            skyBoxMaterial = new th.MeshBasicMaterial({
+                color: 0xffffff,
+                side: th.BackSide
+            });
+            skyBox = new th.Mesh(skyBoxGeometry, skyBoxMaterial);
+            scene.add(skyBox);
+
+            animate();
+
+        };
+
+        function animate() {
+            requestAnimationFrame(animate);
+            render();
+            update();
+        };
+
+        function update() {
+            controls.update();
+        };
+
+        function render() {
+            renderer.render(scene, camera);
+        };
+
+        d3.json('nosdeputes.fr_synthese_2014-07-04.json', setup);
+
+
+    }(d3, THREE, THREEx, window, 'semaines_presence');
+
+
+</script>
+
+</body>
+</html>
