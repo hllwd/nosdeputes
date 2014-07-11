@@ -40,11 +40,23 @@
 
 !function (d3, th, thx, win, sortAttribute) {
 
+    // global vars : threejs
     var container, scene, camera, renderer, controls, mouse, projector, gui;
+    // global vars : ray intersect
     var targetList = new Array();
+    // global vars : data
+    var dataDeputes, deputes, scaleYSortAttribute;
+    // colors
+    var colors = {
+        ECOLO: 0x00CC00, GDR: 0xFF0033, NI: 0x0000A3, RRDP: 0xFF0033, SRC: 0xFF33CC, UDI: 0x00B3FF, UMP: 0x0033FF
+    };
+    // positions for sort
+    var positions = {
+        ECOLO: 1, GDR: 0, NI: 6, RRDP: 2, SRC: 3, UDI: 4, UMP: 5 };
 
 
-    function setup(dataDeputes) {
+    // setup scene
+    function setup(rawData) {
 
         // width
         var w = win.innerWidth;
@@ -66,16 +78,6 @@
         var skyBoxGeometry;
         var skyBoxMaterial;
         var skyBox;
-        // data
-        var deputes = dataDeputes.deputes.map(function (d) {
-            return d.depute;
-        });
-        // scale for y length
-        var scaleYSortAttribute = d3.scale.linear()
-                .domain(d3.extent(deputes, function (d) {
-                    return parseInt(d[sortAttribute]);
-                }))
-                .rangeRound([0, 100]);
         // indexes for assembly loop
         var iCol = 0;
         var iLine = 0;
@@ -108,22 +110,31 @@
         var currentGeometry;
         var currentMaterial;
         var currentCube;
-        // colors
-        var colors = {
-            ECOLO: 0x00CC00, GDR: 0xFF0033, NI: 0x0000A3, RRDP: 0xFF0033, SRC: 0xFF33CC, UDI: 0x00B3FF, UMP: 0x0033FF
+        var ControlObject = {
+            criterion: sortAttribute
         };
-        // positions for sort
-        var positions = {
-            ECOLO: 1, GDR: 0, NI: 6, RRDP: 2, SRC: 3, UDI: 4, UMP: 5 };
-        // target list for mouse interception
+        var criterionController;
+        // control instance
+        var controlInstance = Object.create(ControlObject);
+        var controlData = [
+            'nb_mandats',
+            'semaines_presence',
+            'commission_presences',
+            'commission_interventions',
+            'hemicycle_interventions',
+            'hemicycle_interventions_courtes',
+            'amendements_signes',
+            'amendements_adoptes',
+            'rapports',
+            'propositions_ecrites',
+            'propositions_signees',
+            'questions_ecrites',
+            'questions_orales'
+        ];
 
-        // we sort deputes
-        deputes.sort(function (a, b) {
-            if (a.groupe_sigle !== b.groupe_sigle) {
-                return positions[a.groupe_sigle] - positions[b.groupe_sigle];
-            }
-            return a[sortAttribute] - b[sortAttribute];
-        });
+        // set data
+        dataDeputes = rawData;
+        setupData();
 
         // scene
         scene = new th.Scene();
@@ -216,11 +227,36 @@
 
         // gui
         gui = new dat.GUI();
+        criterionController = gui.add(controlInstance, 'criterion', controlData);
         gui.open();
+        criterionController.onFinishChange(function (value) {
+            console.log(value);
+        });
 
         win.addEventListener('click', onMouseClick, false);
 
         animate();
+    };
+
+    // process datas
+    function setupData() {
+        // data
+        deputes = dataDeputes.deputes.map(function (d) {
+            return d.depute;
+        });
+        // scale for y length
+        scaleYSortAttribute = d3.scale.linear()
+                .domain(d3.extent(deputes, function (d) {
+                    return parseInt(d[sortAttribute]);
+                }))
+                .rangeRound([0, 100]);
+        // we sort deputes
+        deputes.sort(function (a, b) {
+            if (a.groupe_sigle !== b.groupe_sigle) {
+                return positions[a.groupe_sigle] - positions[b.groupe_sigle];
+            }
+            return a[sortAttribute] - b[sortAttribute];
+        });
     };
 
     function animate() {
@@ -257,11 +293,12 @@
 
         // if there is one or more intersections
         if (intersects.length > 0) {
-            alert(intersects[0].object.userData.depute.nom);
+            console.log(intersects[0].object.userData.depute.nom);
         }
 
     };
 
+    // retrieve datas
     d3.json('data/nosdeputes.fr_synthese_2014-07-04.json', setup);
 
 
