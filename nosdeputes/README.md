@@ -12,7 +12,7 @@ A WebGL attempt using the API of [Regards Citoyens] with [three.js] & [d3.js]
 
 * add a selector to change parameter : OK
 * display the selected depute : OK
-* align boxes with a rotation
+* align boxes with a rotation : OK - use cylinders instead
 * outline effect on depute selection
 * add mean for each party
 * add a transition on criterion change

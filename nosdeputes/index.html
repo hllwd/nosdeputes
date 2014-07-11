@@ -27,6 +27,7 @@
             position: fixed;
             padding: 10px;
             font: 11px 'Lucida Grande', sans-serif;
+            display: none;
         }
     </style>
 </head>
@@ -68,8 +69,8 @@
     var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue, messageBoxTimeout;
 
     // dom ready callback
-    function onDomReady(){
-        $messageBox = $('.message-box').hide();
+    function onDomReady() {
+        $messageBox = $('.message-box');
         $messageBoxName = $messageBox.find('#message-box-name');
         $messageBoxParty = $messageBox.find('#message-box-party');
         $messageBoxValue = $messageBox.find('#message-box-value');
@@ -272,10 +273,10 @@
         var currentPoint;
         var currentGeometry;
         var currentMaterial;
-        var currentCube;
+        var currentShape;
 
         // first we remove former datas
-        targetList.forEach(function(d){
+        targetList.forEach(function (d) {
             scene.remove(d);
         });
         targetList = new Array();
@@ -292,14 +293,16 @@
                         Math.cos(currentLine) * currentCol,
                         Math.sin(currentLine) * currentCol
                     ];
-                    currentGeometry = new th.BoxGeometry(sizeBox, currentY, sizeBox);
-                    currentMaterial = new th.MeshLambertMaterial({ color: colors[currentDepute.groupe_sigle] })
-                    currentCube = new th.Mesh(currentGeometry, currentMaterial);
-                    currentCube.position.set(currentPoint[0], 1 + currentY / 2, currentPoint[1]);
-                    currentCube.userData.depute = currentDepute;
-                    scene.add(currentCube);
+                    // radiusAtTop, radiusAtBottom, height, segmentsAroundRadius, segmentsAlongHeight,
+                    currentGeometry = new th.CylinderGeometry(3, 3, currentY, 20, 4),
+                    currentMaterial = new th.MeshLambertMaterial({ color: colors[currentDepute.groupe_sigle] });
+                    currentShape = new th.Mesh(currentGeometry, currentMaterial);
+                    currentShape.position.set(currentPoint[0], 1 + currentY / 2, currentPoint[1]);
+                    currentShape.userData.depute = currentDepute;
+                    scene.add(currentShape);
                     // for intersection purpose
-                    targetList.push(currentCube);
+                    targetList.push(currentShape);
+
                 }
             }
         }
@@ -344,13 +347,13 @@
 
     };
 
-    function displaySelectedDepute(depute){
+    function displaySelectedDepute(depute) {
         win.clearTimeout(messageBoxTimeout);
         $messageBoxName.html(depute.nom);
         $messageBoxParty.html(depute.parti_ratt_financier);
         $messageBoxValue.html(depute[sortAttribute]);
         $messageBox.show();
-        messageBoxTimeout = win.setTimeout(function(){
+        messageBoxTimeout = win.setTimeout(function () {
             $messageBox.hide();
         }, 3000);
     };
@@ -366,7 +369,9 @@
 
 <div class="message-box">
     <p>Name : <span id="message-box-name"></span></p>
+
     <p>Party : <span id="message-box-party"></span></p>
+
     <p>Value : <span id="message-box-value"></span></p>
 </div>
 
