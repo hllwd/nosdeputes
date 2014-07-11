@@ -16,8 +16,17 @@
             height: 100%
         }
 
+        /* dat gui */
         .dg.ac {
             z-index: 2 !important;
+        }
+
+        /* popin for selected depute's informations*/
+        .message-box {
+            z-index: 2;
+            position: fixed;
+            padding: 10px;
+            font: 11px 'Lucida Grande', sans-serif;
         }
     </style>
 </head>
@@ -38,7 +47,7 @@
 
 <script>
 
-!function (d3, th, thx, win, sortAttribute) {
+!function ($, d3, th, thx, win, sortAttribute) {
 
     // global vars : threejs
     var container, scene, camera, renderer, controls, mouse, projector, gui;
@@ -55,7 +64,16 @@
     // positions for sort
     var positions = {
         ECOLO: 1, GDR: 0, NI: 6, RRDP: 2, SRC: 3, UDI: 4, UMP: 5 };
+    // message box
+    var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue, messageBoxTimeout;
 
+    // dom ready callback
+    function onDomReady(){
+        $messageBox = $('.message-box').hide();
+        $messageBoxName = $messageBox.find('#message-box-name');
+        $messageBoxParty = $messageBox.find('#message-box-party');
+        $messageBoxValue = $messageBox.find('#message-box-value');
+    };
 
     // setup scene
     function setup(rawData) {
@@ -101,6 +119,9 @@
             'questions_ecrites',
             'questions_orales'
         ];
+
+        // set up dom ready callback
+        $(onDomReady);
 
         // set hemicycle vars
         setupHemicycle();
@@ -318,19 +339,36 @@
 
         // if there is one or more intersections
         if (intersects.length > 0) {
-            console.log(intersects[0].object.userData.depute.nom);
+            displaySelectedDepute(intersects[0].object.userData.depute);
         }
 
+    };
+
+    function displaySelectedDepute(depute){
+        win.clearTimeout(messageBoxTimeout);
+        $messageBoxName.html(depute.nom);
+        $messageBoxParty.html(depute.parti_ratt_financier);
+        $messageBoxValue.html(depute[sortAttribute]);
+        $messageBox.show();
+        messageBoxTimeout = win.setTimeout(function(){
+            $messageBox.hide();
+        }, 3000);
     };
 
     // retrieve datas
     d3.json('data/nosdeputes.fr_synthese_2014-07-04.json', setup);
 
 
-}(d3, THREE, THREEx, window, 'hemicycle_interventions');
+}(jQuery, d3, THREE, THREEx, window, 'hemicycle_interventions');
 
 
 </script>
+
+<div class="message-box">
+    <p>Name : <span id="message-box-name"></span></p>
+    <p>Party : <span id="message-box-party"></span></p>
+    <p>Value : <span id="message-box-value"></span></p>
+</div>
 
 </body>
 </html>

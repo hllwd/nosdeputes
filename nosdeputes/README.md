@@ -10,11 +10,13 @@ A WebGL attempt using the API of [Regards Citoyens] with [three.js] & [d3.js]
 
 ## Todo list (for the record)
 
-* add a selector to change parameter
-* display the selected depute
-* align box properly with a rotation
-* outline effect on selection
+* add a selector to change parameter : OK
+* display the selected depute : OK
+* align boxes with a rotation
+* outline effect on depute selection
 * add mean for each party
+* add a transition on criterion change
+* display max and min, mean, median, ... for each criterion
 
 [Regards Citoyens]: http://www.regardscitoyens.org/
 [three.js]: http://threejs.org/
