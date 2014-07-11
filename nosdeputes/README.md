@@ -2,6 +2,8 @@
 
 A WebGL attempt using the API of [Regards Citoyens] with [three.js] & [d3.js]
 
+![Hemicycle](https://raw2.github.com/hllwd/dthree.js/master/nosdeputes/img/printscreen.png)
+
 ## Installation
 
 
@@ -17,6 +19,7 @@ A WebGL attempt using the API of [Regards Citoyens] with [three.js] & [d3.js]
 * add mean for each party
 * add a transition on criterion change
 * display max and min, mean, median, ... for each criterion
+* add a search box
 
 [Regards Citoyens]: http://www.regardscitoyens.org/
 [three.js]: http://threejs.org/

@@ -69,7 +69,7 @@
     var positions = {
         ECOLO: 1, GDR: 0, NI: 6, RRDP: 3, SRC: 2, UDI: 4, UMP: 5 };
     // message box
-    var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue, messageBoxTimeout;
+    var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue;
 
     // dom ready callback
     function onDomReady() {
@@ -368,17 +368,17 @@
         if (intersects.length > 0) {
             displaySelectedDepute(intersects[0].object.userData.depute);
             outlineSelectedShape(intersects[0].object);
+        }else {
+            unselectSelectedDepute();
         }
 
     };
 
     function displaySelectedDepute(depute) {
-        win.clearTimeout(messageBoxTimeout);
         $messageBoxName.html(depute.nom);
         $messageBoxParty.html(depute.parti_ratt_financier);
         $messageBoxValue.html(depute[sortAttribute]);
         $messageBox.show();
-        messageBoxTimeout = win.setTimeout(unselectSelectedDepute, 3000);
     };
 
     function unselectSelectedDepute(){
