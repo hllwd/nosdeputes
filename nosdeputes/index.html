@@ -89,7 +89,6 @@
         var aspect = w / h;
         var near = 0.1;
         var far = 20000;
-        var light;
         var sphereGeometry;
         var sphereMaterial;
         var sphere;
@@ -173,15 +172,8 @@
         // controls
         controls = new th.OrbitControls(camera, renderer.domElement);
 
-        // light
-        light = new th.PointLight(0xffffff);
-        light.position.set(0, 250, 0);
-        scene.add(light);
-
-        // light
-        light = new th.PointLight(0xffffff);
-        light.position.set(0, -250, 0);
-        scene.add(light);
+        // lights
+        setupLight();
 
         // draw datas
         drawData();
@@ -208,7 +200,11 @@
         criterionController = gui.add(controlInstance, 'criterion', controlData);
         gui.open();
         criterionController.onFinishChange(function (value) {
+            // unselect selected depute
+            unselectSelectedDepute();
+            // set sort attribute
             sortAttribute = value;
+            // compute datas
             setupData(drawData);
         });
 
@@ -264,6 +260,36 @@
                 .range([minAngle, maxAngle]);
         // size box
         sizeBox = 7;
+    };
+
+    // from http://stackoverflow.com/questions/15478093/realistic-lighting-sunlight-with-three-js
+    function setupLight(){
+        // lights
+        var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
+        hemiLight.position.set( 0, 500, 0 );
+
+        var dirLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
+        dirLight.position.set( -1, 0.75, 1 );
+        dirLight.position.multiplyScalar( 50);
+        dirLight.name = "dirlight";
+        // dirLight.shadowCameraVisible = true;
+
+        dirLight.castShadow = true;
+        dirLight.shadowMapWidth = dirLight.shadowMapHeight = 1024*2;
+
+        var d = 300;
+
+        dirLight.shadowCameraLeft = -d;
+        dirLight.shadowCameraRight = d;
+        dirLight.shadowCameraTop = d;
+        dirLight.shadowCameraBottom = -d;
+
+        dirLight.shadowCameraFar = 3500;
+        dirLight.shadowBias = -0.0001;
+        dirLight.shadowDarkness = 0.35;
+
+        scene.add( hemiLight );
+        scene.add( dirLight );
     };
 
     function drawData() {
