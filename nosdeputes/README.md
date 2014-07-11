@@ -12,6 +12,7 @@ A WebGL attempt using the API of [Regards Citoyens] with [three.js] & [d3.js]
 
 * add a selector to change parameter
 * display the selected depute
+* align box properly with a rotation
 
 
 [Regards Citoyens]: http://www.regardscitoyens.org/
