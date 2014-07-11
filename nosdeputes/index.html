@@ -46,6 +46,8 @@
     var targetList = new Array();
     // global vars : data
     var dataDeputes, deputes, scaleYSortAttribute;
+    // hemicycle
+    var iCol, iLine, maxCol, maxLine, minRadius, maxRadius, scaleRadius, minAngle, maxAngle, scaleAngle, sizeBox;
     // colors
     var colors = {
         ECOLO: 0x00CC00, GDR: 0xFF0033, NI: 0x0000A3, RRDP: 0xFF0033, SRC: 0xFF33CC, UDI: 0x00B3FF, UMP: 0x0033FF
@@ -78,38 +80,6 @@
         var skyBoxGeometry;
         var skyBoxMaterial;
         var skyBox;
-        // indexes for assembly loop
-        var iCol = 0;
-        var iLine = 0;
-        // maxs for assembly loop : 58 * 10
-        var maxCol = 10;
-        var maxLine = 58;
-        // radius
-        var minRadius = 150;
-        var maxRadius = 300;
-        // scale radius
-        var scaleRadius = d3.scale.linear()
-                .domain([0, maxCol])
-                .rangeRound([minRadius, maxRadius]);
-        // angle
-        var minAngle = -Math.PI / 2;
-        var maxAngle = Math.PI / 2;
-        // scale angle
-        var scaleAngle = d3.scale.linear()
-                .domain([0, maxLine])
-                .range([minAngle, maxAngle]);
-        // size box
-        var sizeBox = 7;
-        // loop var
-        var currentIndice = 0;
-        var currentDepute;
-        var currentY = 0;
-        var currentLine;
-        var currentCol;
-        var currentPoint;
-        var currentGeometry;
-        var currentMaterial;
-        var currentCube;
         var ControlObject = {
             criterion: sortAttribute
         };
@@ -131,6 +101,9 @@
             'questions_ecrites',
             'questions_orales'
         ];
+
+        // set hemicycle vars
+        setupHemicycle();
 
         // set data
         dataDeputes = rawData;
@@ -184,29 +157,8 @@
         light.position.set(0, -250, 0);
         scene.add(light);
 
-        for (iLine = 0; iLine < maxLine; iLine += 1) {
-            for (iCol = 0; iCol < maxCol; iCol += 1) {
-                currentIndice = iLine * maxCol + iCol;
-                if (currentIndice < deputes.length) {
-                    currentDepute = deputes[currentIndice];
-                    currentY = scaleYSortAttribute(currentDepute[sortAttribute]);
-                    currentCol = scaleRadius(iCol);
-                    currentLine = scaleAngle(iLine);
-                    currentPoint = [
-                        Math.cos(currentLine) * currentCol,
-                        Math.sin(currentLine) * currentCol
-                    ];
-                    currentGeometry = new th.BoxGeometry(sizeBox, currentY, sizeBox);
-                    currentMaterial = new th.MeshLambertMaterial({ color: colors[currentDepute.groupe_sigle] })
-                    currentCube = new th.Mesh(currentGeometry, currentMaterial);
-                    currentCube.position.set(currentPoint[0], 1 + currentY / 2, currentPoint[1]);
-                    currentCube.userData.depute = currentDepute;
-                    scene.add(currentCube);
-                    // for intersection purpose
-                    targetList.push(currentCube);
-                }
-            }
-        }
+        // draw datas
+        drawData();
 
         // axes
         axes = new th.AxisHelper(100);
@@ -230,7 +182,8 @@
         criterionController = gui.add(controlInstance, 'criterion', controlData);
         gui.open();
         criterionController.onFinishChange(function (value) {
-            console.log(value);
+            sortAttribute = value;
+            setupData(drawData);
         });
 
         win.addEventListener('click', onMouseClick, false);
@@ -239,7 +192,7 @@
     };
 
     // process datas
-    function setupData() {
+    function setupData(cb) {
         // data
         deputes = dataDeputes.deputes.map(function (d) {
             return d.depute;
@@ -257,6 +210,78 @@
             }
             return a[sortAttribute] - b[sortAttribute];
         });
+        if (cb) {
+            cb();
+        }
+    };
+
+    function setupHemicycle() {
+        // indexes for assembly loop
+        iCol = 0;
+        iLine = 0;
+        // maxs for assembly loop : 58 * 10
+        maxCol = 10;
+        maxLine = 58;
+        // radius
+        minRadius = 150;
+        maxRadius = 300;
+        // scale radius
+        scaleRadius = d3.scale.linear()
+                .domain([0, maxCol])
+                .rangeRound([minRadius, maxRadius]);
+        // angle
+        minAngle = -Math.PI / 2;
+        maxAngle = Math.PI / 2;
+        // scale angle
+        scaleAngle = d3.scale.linear()
+                .domain([0, maxLine])
+                .range([minAngle, maxAngle]);
+        // size box
+        sizeBox = 7;
+    };
+
+    function drawData() {
+        console.log('draw datas');
+        // loop var
+        var currentIndice = 0;
+        var currentDepute;
+        var currentY = 0;
+        var currentLine;
+        var currentCol;
+        var currentPoint;
+        var currentGeometry;
+        var currentMaterial;
+        var currentCube;
+
+        // first we remove former datas
+        targetList.forEach(function(d){
+            scene.remove(d);
+        });
+        targetList = new Array();
+
+        for (iLine = 0; iLine < maxLine; iLine += 1) {
+            for (iCol = 0; iCol < maxCol; iCol += 1) {
+                currentIndice = iLine * maxCol + iCol;
+                if (currentIndice < deputes.length) {
+                    currentDepute = deputes[currentIndice];
+                    currentY = scaleYSortAttribute(currentDepute[sortAttribute]);
+                    currentCol = scaleRadius(iCol);
+                    currentLine = scaleAngle(iLine);
+                    currentPoint = [
+                        Math.cos(currentLine) * currentCol,
+                        Math.sin(currentLine) * currentCol
+                    ];
+                    currentGeometry = new th.BoxGeometry(sizeBox, currentY, sizeBox);
+                    currentMaterial = new th.MeshLambertMaterial({ color: colors[currentDepute.groupe_sigle] })
+                    currentCube = new th.Mesh(currentGeometry, currentMaterial);
+                    currentCube.position.set(currentPoint[0], 1 + currentY / 2, currentPoint[1]);
+                    currentCube.userData.depute = currentDepute;
+                    scene.add(currentCube);
+                    // for intersection purpose
+                    targetList.push(currentCube);
+                }
+            }
+        }
     };
 
     function animate() {
