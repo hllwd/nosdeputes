@@ -358,10 +358,12 @@
         $messageBoxParty.html(depute.parti_ratt_financier);
         $messageBoxValue.html(depute[sortAttribute]);
         $messageBox.show();
-        messageBoxTimeout = win.setTimeout(function () {
-            $messageBox.hide();
-            scene.remove(outlineMesh);
-        }, 3000);
+        messageBoxTimeout = win.setTimeout(unselectSelectedDepute, 3000);
+    };
+
+    function unselectSelectedDepute(){
+        $messageBox.hide();
+        scene.remove(outlineMesh);
     };
 
     function outlineSelectedShape(object){
