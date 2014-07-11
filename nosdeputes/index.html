@@ -62,11 +62,11 @@
     var iCol, iLine, maxCol, maxLine, minRadius, maxRadius, scaleRadius, minAngle, maxAngle, scaleAngle, sizeBox;
     // colors
     var colors = {
-        ECOLO: 0x00CC00, GDR: 0xFF0033, NI: 0x0000A3, RRDP: 0xFF0033, SRC: 0xFF33CC, UDI: 0x00B3FF, UMP: 0x0033FF
+        ECOLO: 0x90EE90, GDR: 0xFF0033, NI: 0x191970, RRDP: 0xFFFF00, SRC: 0xFF69B4, UDI: 0x8B008B, UMP: 0x4169E1
     };
     // positions for sort
     var positions = {
-        ECOLO: 1, GDR: 0, NI: 6, RRDP: 2, SRC: 3, UDI: 4, UMP: 5 };
+        ECOLO: 1, GDR: 0, NI: 6, RRDP: 3, SRC: 2, UDI: 4, UMP: 5 };
     // message box
     var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue, messageBoxTimeout;
 
@@ -366,9 +366,15 @@
 
     function outlineSelectedShape(object){
         scene.remove(outlineMesh);
-        outlineMesh = new THREE.Mesh( object.geometry, outlineMaterial );
+        var increment = 1;
+        var outlineGeometry = new th.CylinderGeometry(
+                object.geometry.parameters.radiusTop + increment,
+                object.geometry.parameters.radiusBottom + increment,
+                object.geometry.parameters.height + increment,
+                20,
+                4 );
+        outlineMesh = new THREE.Mesh( outlineGeometry, outlineMaterial );
         outlineMesh.position = object.position;
-        outlineMesh.scale.multiplyScalar(1.10);
         scene.add( outlineMesh );
     };
 
