@@ -54,6 +54,8 @@
     var container, scene, camera, renderer, controls, mouse, projector, gui;
     // global vars : ray intersect
     var targetList = new Array();
+    // outline
+    var outlineMaterial, outlineMesh;
     // global vars : data
     var dataDeputes, deputes, scaleYSortAttribute;
     // hemicycle
@@ -120,6 +122,8 @@
             'questions_ecrites',
             'questions_orales'
         ];
+        // set outline material
+        outlineMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, side: THREE.BackSide } );
 
         // set up dom ready callback
         $(onDomReady);
@@ -343,6 +347,7 @@
         // if there is one or more intersections
         if (intersects.length > 0) {
             displaySelectedDepute(intersects[0].object.userData.depute);
+            outlineSelectedShape(intersects[0].object);
         }
 
     };
@@ -355,7 +360,16 @@
         $messageBox.show();
         messageBoxTimeout = win.setTimeout(function () {
             $messageBox.hide();
+            scene.remove(outlineMesh);
         }, 3000);
+    };
+
+    function outlineSelectedShape(object){
+        scene.remove(outlineMesh);
+        outlineMesh = new THREE.Mesh( object.geometry, outlineMaterial );
+        outlineMesh.position = object.position;
+        outlineMesh.scale.multiplyScalar(1.10);
+        scene.add( outlineMesh );
     };
 
     // retrieve datas
