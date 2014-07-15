@@ -57,6 +57,8 @@
     var container, scene, camera, renderer, controls, mouse, projector, gui;
     // global vars : ray intersect
     var targetList = new Array();
+    // remove list
+    var removeList = new Array();
     // outline
     var outlineMaterial, outlineMesh;
     // global vars : data
@@ -315,7 +317,6 @@
     };
 
     function drawData() {
-        console.log('draw datas');
         // loop var
         var currentIndice = 0;
         var currentDepute;
@@ -329,10 +330,11 @@
         var currentZ;
 
         // first we remove former datas
-        targetList.forEach(function (d) {
+        removeList.forEach(function (d) {
             scene.remove(d);
         });
         targetList = new Array();
+        removeList = new Array();
 
         // add deputes
         for (iLine = 0; iLine < maxLine; iLine += 1) {
@@ -356,6 +358,8 @@
                     scene.add(currentShape);
                     // for intersection purpose
                     targetList.push(currentShape);
+                    // for update
+                    removeList.push(currentShape);
 
                 }
             }
@@ -365,11 +369,13 @@
         parties.forEach(function (currentParty, ind) {
             currentY = scaleYSortAttribute(currentParty.value);
             currentZ = scaleZParty(ind);
-            currentGeometry = new th.CylinderGeometry(3, 3, currentY, 20, 4);
+            currentGeometry = new th.CylinderGeometry(6, 6, currentY, 20, 4);
             currentMaterial = new th.MeshLambertMaterial({ color: colors[currentParty.party] });
             currentShape = new th.Mesh(currentGeometry, currentMaterial);
             currentShape.position.set(0, 1 + currentY / 2, currentZ);
             scene.add(currentShape);
+            // for update
+            removeList.push(currentShape);
         });
 
     };
