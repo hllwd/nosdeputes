@@ -369,7 +369,7 @@
         parties.forEach(function (currentParty, ind) {
             currentY = scaleYSortAttribute(currentParty.value);
             currentZ = scaleZParty(ind);
-            currentGeometry = new th.CylinderGeometry(6, 6, currentY, 20, 4);
+            currentGeometry = new th.CylinderGeometry(10, 10, currentY, 20, 4);
             currentMaterial = new th.MeshLambertMaterial({ color: colors[currentParty.party] });
             currentShape = new th.Mesh(currentGeometry, currentMaterial);
             currentShape.position.set(0, 1 + currentY / 2, currentZ);
