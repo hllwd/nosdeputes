@@ -16,7 +16,7 @@ A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js]
 * display the selected depute : OK
 * align boxes with a rotation : OK - use cylinders instead
 * outline effect on depute selection : OK
-* add mean for each party
+* add mean for each party : OK
 * add a transition on criterion change
 * display max and min, mean, median, ... for each criterion
 * add a search box

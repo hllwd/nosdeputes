@@ -17,5 +17,8 @@
     "d3": "~3.4.8",
     "threex.windowresize": "*",
     "jquery": "~2.1.1"
+  },
+  "devDependencies": {
+    "lodash": "~2.4.1"
   }
 }

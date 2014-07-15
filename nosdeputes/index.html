@@ -33,11 +33,13 @@
     </style>
 </head>
 <body>
-
+<!-- jquery -->
 <script src="../bower_components/jquery/dist/jquery.min.js"></script>
-
+<!-- d3 -->
 <script src="../bower_components/d3/d3.min.js"></script>
-
+<!-- lodash -->
+<script src="../bower_components/lodash/dist/lodash.min.js"></script>
+<!-- three -->
 <script src="../other_components/Three/three.min.js"></script>
 <script src="../other_components/Detector/Detector.js"></script>
 <script src="../other_components/THREEx.FullScreen/THREEx.FullScreen.js"></script>
@@ -49,7 +51,7 @@
 
 <script>
 
-!function ($, d3, th, thx, win, sortAttribute) {
+!function ($, d3, th, thx, _, win, sortAttribute) {
 
     // global vars : threejs
     var container, scene, camera, renderer, controls, mouse, projector, gui;
@@ -58,9 +60,11 @@
     // outline
     var outlineMaterial, outlineMesh;
     // global vars : data
-    var dataDeputes, deputes, scaleYSortAttribute;
+    var dataDeputes, deputes, scaleYSortAttribute, parties;
     // hemicycle
     var iCol, iLine, maxCol, maxLine, minRadius, maxRadius, scaleRadius, minAngle, maxAngle, scaleAngle, sizeBox;
+    // party mean
+    var scaleZParty;
     // colors
     var colors = {
         ECOLO: 0x90EE90, GDR: 0xFF0033, NI: 0x191970, RRDP: 0xFFFF00, SRC: 0xFF69B4, UDI: 0x8B008B, UMP: 0x4169E1
@@ -116,7 +120,7 @@
             'questions_orales'
         ];
         // set outline material
-        outlineMaterial = new THREE.MeshBasicMaterial( { color: 0x00ff00, side: THREE.BackSide } );
+        outlineMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00, side: THREE.BackSide });
 
         // set up dom ready callback
         $(onDomReady);
@@ -209,6 +213,7 @@
 
     // process datas
     function setupData(cb) {
+        var tempHashParties;
         // data
         deputes = dataDeputes.deputes.map(function (d) {
             return d.depute;
@@ -226,6 +231,29 @@
             }
             return a[sortAttribute] - b[sortAttribute];
         });
+
+        // let's deal with parties - the crappy way
+        parties = new Array();
+        // first, we group deputes by party
+        tempHashParties = _.groupBy(deputes, function (d) {
+            return d.groupe_sigle;
+        });
+        // then, we compute mean for each party
+        for (var partyKey in tempHashParties) {
+            parties.push({
+                party: partyKey,
+                value: d3.round(d3.mean(tempHashParties[partyKey], function (p) {
+                    return parseInt(p[sortAttribute]);
+                }), 2)
+            });
+        }
+        ;
+
+        // compute the scale
+        scaleZParty = d3.scale.linear()
+                .domain([0, parties.length-1])
+                .rangeRound([-minRadius / 2, minRadius / 2]);
+
         if (cb) {
             cb();
         }
@@ -257,19 +285,19 @@
     };
 
     // from http://stackoverflow.com/questions/15478093/realistic-lighting-sunlight-with-three-js
-    function setupLight(){
+    function setupLight() {
         // lights
-        var hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.6 );
-        hemiLight.position.set( 0, 500, 0 );
+        var hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
+        hemiLight.position.set(0, 500, 0);
 
-        var dirLight = new THREE.DirectionalLight( 0xffffff, 0.6 );
-        dirLight.position.set( -1, 0.75, 1 );
-        dirLight.position.multiplyScalar( 50);
+        var dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+        dirLight.position.set(-1, 0.75, 1);
+        dirLight.position.multiplyScalar(50);
         dirLight.name = "dirlight";
         // dirLight.shadowCameraVisible = true;
 
         dirLight.castShadow = true;
-        dirLight.shadowMapWidth = dirLight.shadowMapHeight = 1024*2;
+        dirLight.shadowMapWidth = dirLight.shadowMapHeight = 1024 * 2;
 
         var d = 300;
 
@@ -282,8 +310,8 @@
         dirLight.shadowBias = -0.0001;
         dirLight.shadowDarkness = 0.35;
 
-        scene.add( hemiLight );
-        scene.add( dirLight );
+        scene.add(hemiLight);
+        scene.add(dirLight);
     };
 
     function drawData() {
@@ -298,6 +326,7 @@
         var currentGeometry;
         var currentMaterial;
         var currentShape;
+        var currentZ;
 
         // first we remove former datas
         targetList.forEach(function (d) {
@@ -305,6 +334,7 @@
         });
         targetList = new Array();
 
+        // add deputes
         for (iLine = 0; iLine < maxLine; iLine += 1) {
             for (iCol = 0; iCol < maxCol; iCol += 1) {
                 currentIndice = iLine * maxCol + iCol;
@@ -318,7 +348,7 @@
                         Math.sin(currentLine) * currentCol
                     ];
                     // radiusAtTop, radiusAtBottom, height, segmentsAroundRadius, segmentsAlongHeight,
-                    currentGeometry = new th.CylinderGeometry(3, 3, currentY, 20, 4),
+                    currentGeometry = new th.CylinderGeometry(3, 3, currentY, 20, 4);
                     currentMaterial = new th.MeshLambertMaterial({ color: colors[currentDepute.groupe_sigle] });
                     currentShape = new th.Mesh(currentGeometry, currentMaterial);
                     currentShape.position.set(currentPoint[0], 1 + currentY / 2, currentPoint[1]);
@@ -330,6 +360,18 @@
                 }
             }
         }
+
+        // add parties
+        parties.forEach(function (currentParty, ind) {
+            currentY = scaleYSortAttribute(currentParty.value);
+            currentZ = scaleZParty(ind);
+            currentGeometry = new th.CylinderGeometry(3, 3, currentY, 20, 4);
+            currentMaterial = new th.MeshLambertMaterial({ color: colors[currentParty.party] });
+            currentShape = new th.Mesh(currentGeometry, currentMaterial);
+            currentShape.position.set(0, 1 + currentY / 2, currentZ);
+            scene.add(currentShape);
+        });
+
     };
 
     function animate() {
@@ -368,7 +410,7 @@
         if (intersects.length > 0) {
             displaySelectedDepute(intersects[0].object.userData.depute);
             outlineSelectedShape(intersects[0].object);
-        }else {
+        } else {
             unselectSelectedDepute();
         }
 
@@ -381,12 +423,12 @@
         $messageBox.show();
     };
 
-    function unselectSelectedDepute(){
+    function unselectSelectedDepute() {
         $messageBox.hide();
         scene.remove(outlineMesh);
     };
 
-    function outlineSelectedShape(object){
+    function outlineSelectedShape(object) {
         scene.remove(outlineMesh);
         var increment = 1;
         var outlineGeometry = new th.CylinderGeometry(
@@ -394,17 +436,17 @@
                 object.geometry.parameters.radiusBottom + increment,
                 object.geometry.parameters.height + increment,
                 20,
-                4 );
-        outlineMesh = new THREE.Mesh( outlineGeometry, outlineMaterial );
+                4);
+        outlineMesh = new THREE.Mesh(outlineGeometry, outlineMaterial);
         outlineMesh.position = object.position;
-        scene.add( outlineMesh );
+        scene.add(outlineMesh);
     };
 
     // retrieve datas
     d3.json('data/nosdeputes.fr_synthese_2014-07-04.json', setup);
 
 
-}(jQuery, d3, THREE, THREEx, window, 'hemicycle_interventions');
+}(jQuery, d3, THREE, THREEx, _, window, 'hemicycle_interventions');
 
 
 </script>
