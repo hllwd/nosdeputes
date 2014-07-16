@@ -253,7 +253,7 @@
 
         // compute the scale
         scaleZParty = d3.scale.linear()
-                .domain([0, parties.length-1])
+                .domain([0, parties.length - 1])
                 .rangeRound([-minRadius / 2, minRadius / 2]);
 
         if (cb) {
@@ -317,6 +317,22 @@
     };
 
     function drawData() {
+
+        // first we remove former datas
+        removeList.forEach(function (d) {
+            scene.remove(d);
+        });
+        targetList = new Array();
+        removeList = new Array();
+
+        // draw deputes
+        drawDeputes();
+
+        // draw parties
+        drawParties();
+    };
+
+    function drawDeputes() {
         // loop var
         var currentIndice = 0;
         var currentDepute;
@@ -327,16 +343,7 @@
         var currentGeometry;
         var currentMaterial;
         var currentShape;
-        var currentZ;
 
-        // first we remove former datas
-        removeList.forEach(function (d) {
-            scene.remove(d);
-        });
-        targetList = new Array();
-        removeList = new Array();
-
-        // add deputes
         for (iLine = 0; iLine < maxLine; iLine += 1) {
             for (iCol = 0; iCol < maxCol; iCol += 1) {
                 currentIndice = iLine * maxCol + iCol;
@@ -364,8 +371,15 @@
                 }
             }
         }
+    };
 
-        // add parties
+    function drawParties(){
+        var currentY = 0;
+        var currentGeometry;
+        var currentMaterial;
+        var currentShape;
+        var currentZ;
+
         parties.forEach(function (currentParty, ind) {
             currentY = scaleYSortAttribute(currentParty.value);
             currentZ = scaleZParty(ind);
@@ -377,7 +391,6 @@
             // for update
             removeList.push(currentShape);
         });
-
     };
 
     function animate() {
@@ -452,7 +465,7 @@
     d3.json('data/nosdeputes.fr_synthese_2014-07-04.json', setup);
 
 
-}(jQuery, d3, THREE, THREEx, _, window, 'hemicycle_interventions');
+}(jQuery, d3, THREE, THREEx, _, window, 'commission_presences');
 
 
 </script>
