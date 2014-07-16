@@ -308,7 +308,7 @@
         var dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
         dirLight.position.set(-1, 0.75, 1);
         dirLight.position.multiplyScalar(50);
-        dirLight.name = "dirlight";
+        dirLight.name = 'dirlight';
         // dirLight.shadowCameraVisible = true;
 
         dirLight.castShadow = true;
@@ -375,9 +375,9 @@
                     currentGeometry = new th.CylinderGeometry(3, 3, currentY, 20, 4);
                     currentMaterial = new th.MeshLambertMaterial({ color: colors[currentDepute.groupe_sigle] });
                     currentShape = new th.Mesh(currentGeometry, currentMaterial);
-                    currentShape.position.set(currentPoint[0], 0, currentPoint[1]);
+                    currentShape.position.set(currentPoint[0], currentY / 2, currentPoint[1]);
+                    currentShape.scale.setY(0);
                     currentShape.userData.depute = currentDepute;
-                    currentShape.userData.y = currentY;
                     scene.add(currentShape);
                     // for intersection purpose
                     targetList.push(currentShape);
@@ -401,8 +401,8 @@
             currentGeometry = new th.CylinderGeometry(6, 6, currentY, 20, 4);
             currentMaterial = new th.MeshLambertMaterial({ color: colors[currentParty.party] });
             currentShape = new th.Mesh(currentGeometry, currentMaterial);
-            currentShape.position.set(0, 0, currentZ);
-            currentShape.userData.y = currentY;
+            currentShape.position.set(0, currentY / 2, currentZ);
+            currentShape.scale.setY(0);
             scene.add(currentShape);
             // for update
             removeList.push(currentShape);
@@ -411,8 +411,7 @@
 
     function updateElements(t) {
         removeList.forEach(function (shape) {
-            var ny = t * shape.userData.y *.5;
-            shape.position.setY(ny);
+            shape.scale.setY(t);
         });
     };
 
