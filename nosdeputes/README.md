@@ -20,6 +20,7 @@ A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js]
 * add a transition on criterion change : OK
 * display max and min, mean, median, ... for each criterion
 * add a search box
+* enhance selected depute's display : picture, ...
 
 [API]: http://cpc.regardscitoyens.org/trac/wiki/API
 [Regards Citoyens]: http://www.regardscitoyens.org/
