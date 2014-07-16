@@ -67,6 +67,11 @@
     var iCol, iLine, maxCol, maxLine, minRadius, maxRadius, scaleRadius, minAngle, maxAngle, scaleAngle, sizeBox;
     // party mean
     var scaleZParty;
+    // animation
+    var currentTimeAnimation = 0;
+    var maxTimeAnimation = 10;
+    // scale for animation
+    var scaleAnimation;
     // colors
     var colors = {
         ECOLO: 0x90EE90, GDR: 0xFF0033, NI: 0x191970, RRDP: 0xFFFF00, SRC: 0xFF69B4, UDI: 0x8B008B, UMP: 0x4169E1
@@ -132,7 +137,11 @@
 
         // set data
         dataDeputes = rawData;
-        setupData();
+
+        // set up animation
+        scaleAnimation = d3.scale.linear()
+                .domain([0, maxTimeAnimation])
+                .range([0, 1]);
 
         // scene
         scene = new th.Scene();
@@ -175,9 +184,6 @@
         // lights
         setupLight();
 
-        // draw datas
-        drawData();
-
         // axes
         axes = new th.AxisHelper(100);
         scene.add(axes);
@@ -205,16 +211,25 @@
             // set sort attribute
             sortAttribute = value;
             // compute datas
-            setupData(drawData);
+            setupData();
         });
 
         win.addEventListener('click', onMouseClick, false);
 
+        setupData();
+
         animate();
     };
 
+    function resetAnimation() {
+        currentTimeAnimation = 0;
+        removeShapes();
+        addDeputes();
+        addParties();
+    };
+
     // process datas
-    function setupData(cb) {
+    function setupData() {
         var tempHashParties;
         // data
         deputes = dataDeputes.deputes.map(function (d) {
@@ -255,10 +270,8 @@
         scaleZParty = d3.scale.linear()
                 .domain([0, parties.length - 1])
                 .rangeRound([-minRadius / 2, minRadius / 2]);
-
-        if (cb) {
-            cb();
-        }
+        // reset animation
+        resetAnimation();
     };
 
     function setupHemicycle() {
@@ -316,27 +329,29 @@
         scene.add(dirLight);
     };
 
-    function drawData() {
+    function draw() {
+        if (currentTimeAnimation <= maxTimeAnimation) {
+            var currentTime = scaleAnimation(currentTimeAnimation);
+            // update elements
+            updateElements(currentTime);
+            // increase current time for animation
+            currentTimeAnimation += 1;
+        }
+    };
 
-        // first we remove former datas
+    function removeShapes() {
         removeList.forEach(function (d) {
             scene.remove(d);
         });
         targetList = new Array();
         removeList = new Array();
-
-        // draw deputes
-        drawDeputes();
-
-        // draw parties
-        drawParties();
     };
 
-    function drawDeputes() {
+    function addDeputes() {
         // loop var
-        var currentIndice = 0;
+        var currentIndice;
         var currentDepute;
-        var currentY = 0;
+        var currentY;
         var currentLine;
         var currentCol;
         var currentPoint;
@@ -360,20 +375,20 @@
                     currentGeometry = new th.CylinderGeometry(3, 3, currentY, 20, 4);
                     currentMaterial = new th.MeshLambertMaterial({ color: colors[currentDepute.groupe_sigle] });
                     currentShape = new th.Mesh(currentGeometry, currentMaterial);
-                    currentShape.position.set(currentPoint[0], 1 + currentY / 2, currentPoint[1]);
+                    currentShape.position.set(currentPoint[0], 0, currentPoint[1]);
                     currentShape.userData.depute = currentDepute;
+                    currentShape.userData.y = currentY;
                     scene.add(currentShape);
                     // for intersection purpose
                     targetList.push(currentShape);
                     // for update
                     removeList.push(currentShape);
-
                 }
             }
         }
     };
 
-    function drawParties(){
+    function addParties() {
         var currentY = 0;
         var currentGeometry;
         var currentMaterial;
@@ -386,15 +401,24 @@
             currentGeometry = new th.CylinderGeometry(6, 6, currentY, 20, 4);
             currentMaterial = new th.MeshLambertMaterial({ color: colors[currentParty.party] });
             currentShape = new th.Mesh(currentGeometry, currentMaterial);
-            currentShape.position.set(0, 1 + currentY / 2, currentZ);
+            currentShape.position.set(0, 0, currentZ);
+            currentShape.userData.y = currentY;
             scene.add(currentShape);
             // for update
             removeList.push(currentShape);
         });
     };
 
+    function updateElements(t) {
+        removeList.forEach(function (shape) {
+            var ny = t * shape.userData.y *.5;
+            shape.position.setY(ny);
+        });
+    };
+
     function animate() {
         requestAnimationFrame(animate);
+        draw();
         render();
         update();
     };
