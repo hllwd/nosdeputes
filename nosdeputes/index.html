@@ -141,8 +141,8 @@
         camera = new th.PerspectiveCamera(viewAngle, aspect, near, far);
         // add the camera to the scene at the default position (0,0,0)
         scene.add(camera);
-        // so pull it back (z = 400) and up (y = 100)
-        camera.position.set(0, 100, 400);
+        // so pull it back
+        camera.position.set(-800, 800, -800);
         // and set the angle towards the scene origin
         camera.lookAt(scene.position);
 
@@ -222,9 +222,9 @@
         });
         // scale for y length
         scaleYSortAttribute = d3.scale.linear()
-                .domain(d3.extent(deputes, function (d) {
+                .domain([0, d3.max(deputes, function (d) {
                     return parseInt(d[sortAttribute]);
-                }))
+                })])
                 .rangeRound([0, 100]);
         // we sort deputes
         deputes.sort(function (a, b) {
@@ -369,7 +369,7 @@
         parties.forEach(function (currentParty, ind) {
             currentY = scaleYSortAttribute(currentParty.value);
             currentZ = scaleZParty(ind);
-            currentGeometry = new th.CylinderGeometry(10, 10, currentY, 20, 4);
+            currentGeometry = new th.CylinderGeometry(6, 6, currentY, 20, 4);
             currentMaterial = new th.MeshLambertMaterial({ color: colors[currentParty.party] });
             currentShape = new th.Mesh(currentGeometry, currentMaterial);
             currentShape.position.set(0, 1 + currentY / 2, currentZ);
