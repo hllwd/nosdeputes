@@ -497,7 +497,12 @@
         displaySelectedDepute(depute);
         if(object){
             outlineSelectedShape(object);
+        }else {
+            outlineSelectedShape(_.find(targetList, function(obj){
+                return obj.userData.depute.id === depute.id;
+            }));
         }
+        $autocomplete.val('');
     };
 
     function displaySelectedDepute(depute) {
