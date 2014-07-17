@@ -30,11 +30,27 @@
             display: none;
             left: 50%;
         }
+
+        /* search box */
+        .search-box {
+            z-index: 2;
+            position: fixed;
+            padding: 10px;
+            font: 11px 'Lucida Grande', sans-serif;
+            left: 10px;
+        }
+
+        .search-box input {
+            border: solid 1px black;
+            width: 200px;
+        }
+
     </style>
 </head>
 <body>
 <!-- jquery -->
 <script src="../bower_components/jquery/dist/jquery.min.js"></script>
+<script src="../bower_components/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
 <!-- d3 -->
 <script src="../bower_components/d3/d3.min.js"></script>
 <!-- lodash -->
@@ -81,6 +97,8 @@
         ECOLO: 1, GDR: 0, NI: 6, RRDP: 3, SRC: 2, UDI: 4, UMP: 5 };
     // message box
     var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue;
+    // select box
+    var $autocomplete;
 
     // dom ready callback
     function onDomReady() {
@@ -88,6 +106,7 @@
         $messageBoxName = $messageBox.find('#message-box-name');
         $messageBoxParty = $messageBox.find('#message-box-party');
         $messageBoxValue = $messageBox.find('#message-box-value');
+        $autocomplete = $('.search-box input');
     };
 
     // setup scene
@@ -218,6 +237,9 @@
 
         setupData();
 
+        // needs to be after data setup
+        setupAutocomplete();
+
         animate();
     };
 
@@ -226,6 +248,20 @@
         removeShapes();
         addDeputes();
         addParties();
+    };
+
+    function setupAutocomplete() {
+        $autocomplete.autocomplete({
+            lookup: deputes.map(function (d) {
+                return {
+                    value: d.nom,
+                    data: d
+                };
+            }),
+            onSelect: function(suggestion){
+                displaySelectedDepute(suggestion.data);
+            }
+        });
     };
 
     // process datas
@@ -499,6 +535,10 @@
     <p>Party : <span id="message-box-party"></span></p>
 
     <p>Value : <span id="message-box-value"></span></p>
+</div>
+
+<div class="search-box">
+    <input type="text"/>
 </div>
 
 </body>
