@@ -2,10 +2,14 @@
 
 datavis tests with d3.js and three.js
 
-## Install
+## Installation
 
+    npm install
     bower install
 
+## Launch
+
+    node index.js
 
 ## Dependencies
 

@@ -6,9 +6,13 @@ A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js]
 
 ## Installation
 
-
+    cd nosdeputes
+    npm install
     bower install
 
+## Launch
+
+    node index.js
 
 ## Todo list (for the record)
 
