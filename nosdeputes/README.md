@@ -22,6 +22,7 @@ A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js]
 * add a search box
 * enhance selected depute's display : picture, ...
 * fix "Matrix3.getInverse(): can't invert matrix, determinant is 0"
+* fix M key display full screen
 
 [API]: http://cpc.regardscitoyens.org/trac/wiki/API
 [Regards Citoyens]: http://www.regardscitoyens.org/
