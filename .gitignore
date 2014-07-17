@@ -1,1 +1,6 @@
 # bower compo
+bower_components/*
+
+# npm
+node_modules/*
+
