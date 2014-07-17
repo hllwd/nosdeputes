@@ -259,7 +259,7 @@
                 };
             }),
             onSelect: function(suggestion){
-                displaySelectedDepute(suggestion.data);
+                selectDepute(suggestion.data);
             }
         });
     };
@@ -486,12 +486,18 @@
 
         // if there is one or more intersections
         if (intersects.length > 0) {
-            displaySelectedDepute(intersects[0].object.userData.depute);
-            outlineSelectedShape(intersects[0].object);
+            selectDepute(intersects[0].object.userData.depute, intersects[0].object);
         } else {
             unselectSelectedDepute();
         }
 
+    };
+
+    function selectDepute(depute, object){
+        displaySelectedDepute(depute);
+        if(object){
+            outlineSelectedShape(object);
+        }
     };
 
     function displaySelectedDepute(depute) {
