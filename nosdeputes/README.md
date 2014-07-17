@@ -19,7 +19,7 @@ A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js]
 * add mean for each party : OK
 * add a transition on criterion change : OK
 * display max and min, mean, median, ... for each criterion
-* add a search box
+* add a search box : OK
 * enhance selected depute's display : picture, ...
 * fix "Matrix3.getInverse(): can't invert matrix, determinant is 0"
 * fix M key display full screen
