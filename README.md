@@ -38,6 +38,7 @@ and then open the [index page]
     * display more information
 * fix "Matrix3.getInverse(): can't invert matrix, determinant is 0"
 * fix M key display full screen : OK
+* threejs r68 compatibility
 
 [API]: http://cpc.regardscitoyens.org/trac/wiki/API
 [Regards Citoyens]: http://www.regardscitoyens.org/
