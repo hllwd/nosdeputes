@@ -37,6 +37,7 @@ app.route('/api/synthese').get(api.synthese);
 /**
  * Launch server
  */
-http.createServer(app).listen(app.get('port'), function () {
-    console.log('Express server listening on port ' + app.get('port'));
+var port = Number(process.env.PORT || 5000);
+app.listen(port, function () {
+	console.log("Listening on " + port);
 });
