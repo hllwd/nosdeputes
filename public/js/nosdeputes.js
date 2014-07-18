@@ -456,7 +456,7 @@
 
     function outlineSelectedShape(object) {
         scene.remove(outlineMesh);
-        var increment = 1;
+        var increment = 2;
         var outlineGeometry = new th.CylinderGeometry(
             object.geometry.parameters.radiusTop + increment,
             object.geometry.parameters.radiusBottom + increment,
