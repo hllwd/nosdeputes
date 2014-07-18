@@ -190,7 +190,7 @@
                     data: d
                 };
             }),
-            onSelect: function(suggestion){
+            onSelect: function (suggestion) {
                 selectDepute(suggestion.data);
             }
         });
@@ -425,12 +425,12 @@
 
     };
 
-    function selectDepute(depute, object){
+    function selectDepute(depute, object) {
         displaySelectedDepute(depute);
-        if(object){
+        if (object) {
             outlineSelectedShape(object);
-        }else {
-            outlineSelectedShape(_.find(targetList, function(obj){
+        } else {
+            outlineSelectedShape(_.find(targetList, function (obj) {
                 return obj.userData.depute.id === depute.id;
             }));
         }
@@ -438,7 +438,7 @@
     };
 
     function displaySelectedDepute(depute) {
-        $messageBoxImg.attr('src', 'http://www.nosdeputes.fr/depute/photo/' + depute.slug + '/100');
+        $messageBoxImg.attr('src', 'http://www.nosdeputes.fr/depute/photo/' + depute.slug + '/245');
         $messageBoxName.html(depute.nom);
         $messageBoxParty.html(depute.parti_ratt_financier);
         $messageBoxValue.html(depute[sortAttribute]);
