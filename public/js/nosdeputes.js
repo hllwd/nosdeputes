@@ -128,10 +128,6 @@
         // events
         // automatically resize renderer
         thx.WindowResize(renderer, camera);
-        // toggle full screen on given key-press
-        thx.FullScreen.bindKey({
-            charCode: 'm'.charCodeAt(0)
-        });
 
         // controls
         controls = new th.OrbitControls(camera, renderer.domElement);

@@ -37,7 +37,7 @@ and then open the [index page]
     * enhance selected depute's display : picture, ... : OK
     * display more information
 * fix "Matrix3.getInverse(): can't invert matrix, determinant is 0"
-* fix M key display full screen
+* fix M key display full screen : OK
 
 [API]: http://cpc.regardscitoyens.org/trac/wiki/API
 [Regards Citoyens]: http://www.regardscitoyens.org/
