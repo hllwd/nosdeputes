@@ -1,3 +1,3 @@
-define( [ './threex.windowresize.js',
+define( [ './threex.windowresize',
 	], function(){
 });
