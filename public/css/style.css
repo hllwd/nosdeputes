@@ -43,3 +43,11 @@ canvas {
     left: 0px;
     top: 0px
 }
+
+.source {
+    z-index: 2;
+    position: fixed;
+    right: 10px;
+    bottom: 10px;
+    font: 11px 'Lucida Grande', sans-serif;
+}
