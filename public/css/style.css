@@ -78,4 +78,5 @@ canvas {
     right: 10px;
     bottom: 10px;
     font: 11px 'Lucida Grande', sans-serif;
+    text-align: right;
 }
