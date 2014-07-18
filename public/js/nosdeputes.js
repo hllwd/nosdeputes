@@ -25,7 +25,7 @@
     var scaleAnimation;
     // colors
     var colors = {
-        ECOLO: 0x90EE90, GDR: 0xFF0033, NI: 0x191970, RRDP: 0xFFFF00, SRC: 0xFF69B4, UDI: 0x8B008B, UMP: 0x4169E1
+        ECOLO: 0x90EE90, GDR: 0xFF0033, NI: 0x999999, RRDP: 0xFF8C00, SRC: 0xFF69B4, UDI: 0xB0E0E6, UMP: 0x4169E1
     };
     // positions for sort
     var positions = {
