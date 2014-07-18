@@ -1,7 +1,10 @@
 {
     "name": "nosdeputes",
     "version": "0.0.0",
-    "description": "datavis tests with d3.js and three.js",
+	"engines": {
+		"node": "0.10.26"
+	},
+	"description": "datavis tests with d3.js and three.js",
     "main": "index.js",
     "repository": {
         "type": "git",
