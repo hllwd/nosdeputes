@@ -1,71 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8"/>
-
-    <title>Nos députes</title>
-
-    <style>
-        body {
-            margin: 0;
-        }
-
-        /* reset */
-        canvas {
-            width: 100%;
-            height: 100%
-        }
-
-        /* dat gui */
-        .dg.ac {
-            z-index: 2 !important;
-        }
-
-        /* popin for selected depute's informations*/
-        .message-box {
-            z-index: 2;
-            position: fixed;
-            padding: 10px;
-            font: 11px 'Lucida Grande', sans-serif;
-            display: none;
-            left: 50%;
-        }
-
-        /* search box */
-        .search-box {
-            z-index: 2;
-            position: fixed;
-            padding: 10px;
-            font: 11px 'Lucida Grande', sans-serif;
-            left: 10px;
-        }
-
-        .search-box input {
-            border: solid 1px black;
-            width: 200px;
-        }
-
-    </style>
-</head>
-<body>
-<!-- jquery -->
-<script src="../bower_components/jquery/dist/jquery.min.js"></script>
-<script src="../bower_components/devbridge-autocomplete/dist/jquery.autocomplete.min.js"></script>
-<!-- d3 -->
-<script src="../bower_components/d3/d3.min.js"></script>
-<!-- lodash -->
-<script src="../bower_components/lodash/dist/lodash.min.js"></script>
-<!-- three -->
-<script src="../other_components/Three/three.min.js"></script>
-<script src="../other_components/Detector/Detector.js"></script>
-<script src="../other_components/THREEx.FullScreen/THREEx.FullScreen.js"></script>
-<script src="../bower_components/threex.windowresize/threex.windowresize.js"></script>
-<script src="../other_components/OrbitControls/OrbitControls.js"></script>
-<script src="../other_components/DAT/dat.gui.min.js"></script>
-
-<div id="container" style="z-index: 1; position: absolute; left:0px; top:0px"></div>
-
-<script>
+/**
+ * Created by nmondon on 18/07/2014.
+ */
 
 !function ($, d3, th, thx, _, win, sortAttribute) {
 
@@ -96,7 +31,7 @@
     var positions = {
         ECOLO: 1, GDR: 0, NI: 6, RRDP: 3, SRC: 2, UDI: 4, UMP: 5 };
     // message box
-    var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue;
+    var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue, $messageBoxImg;
     // select box
     var $autocomplete;
 
@@ -106,6 +41,7 @@
         $messageBoxName = $messageBox.find('#message-box-name');
         $messageBoxParty = $messageBox.find('#message-box-party');
         $messageBoxValue = $messageBox.find('#message-box-value');
+        $messageBoxImg = $messageBox.find('img');
         $autocomplete = $('.search-box input');
     };
 
@@ -159,8 +95,8 @@
 
         // set up animation
         scaleAnimation = d3.scale.linear()
-                .domain([0, maxTimeAnimation])
-                .range([0, 1]);
+            .domain([0, maxTimeAnimation])
+            .range([0, 1]);
 
         // scene
         scene = new th.Scene();
@@ -273,10 +209,10 @@
         });
         // scale for y length
         scaleYSortAttribute = d3.scale.linear()
-                .domain([0, d3.max(deputes, function (d) {
-                    return parseInt(d[sortAttribute]);
-                })])
-                .rangeRound([0, 100]);
+            .domain([0, d3.max(deputes, function (d) {
+                return parseInt(d[sortAttribute]);
+            })])
+            .rangeRound([0, 100]);
         // we sort deputes
         deputes.sort(function (a, b) {
             if (a.groupe_sigle !== b.groupe_sigle) {
@@ -304,8 +240,8 @@
 
         // compute the scale
         scaleZParty = d3.scale.linear()
-                .domain([0, parties.length - 1])
-                .rangeRound([-minRadius / 2, minRadius / 2]);
+            .domain([0, parties.length - 1])
+            .rangeRound([-minRadius / 2, minRadius / 2]);
         // reset animation
         resetAnimation();
     };
@@ -322,15 +258,15 @@
         maxRadius = 300;
         // scale radius
         scaleRadius = d3.scale.linear()
-                .domain([0, maxCol])
-                .rangeRound([minRadius, maxRadius]);
+            .domain([0, maxCol])
+            .rangeRound([minRadius, maxRadius]);
         // angle
         minAngle = -Math.PI / 2;
         maxAngle = Math.PI / 2;
         // scale angle
         scaleAngle = d3.scale.linear()
-                .domain([0, maxLine])
-                .range([minAngle, maxAngle]);
+            .domain([0, maxLine])
+            .range([minAngle, maxAngle]);
         // size box
         sizeBox = 7;
     };
@@ -506,6 +442,7 @@
     };
 
     function displaySelectedDepute(depute) {
+        $messageBoxImg.attr('src', 'http://www.nosdeputes.fr/depute/photo/' + depute.slug + '/100');
         $messageBoxName.html(depute.nom);
         $messageBoxParty.html(depute.parti_ratt_financier);
         $messageBoxValue.html(depute[sortAttribute]);
@@ -521,36 +458,18 @@
         scene.remove(outlineMesh);
         var increment = 1;
         var outlineGeometry = new th.CylinderGeometry(
-                object.geometry.parameters.radiusTop + increment,
-                object.geometry.parameters.radiusBottom + increment,
-                object.geometry.parameters.height + increment,
-                20,
-                4);
+            object.geometry.parameters.radiusTop + increment,
+            object.geometry.parameters.radiusBottom + increment,
+            object.geometry.parameters.height + increment,
+            20,
+            4);
         outlineMesh = new th.Mesh(outlineGeometry, outlineMaterial);
         outlineMesh.position = object.position;
         scene.add(outlineMesh);
     };
 
     // retrieve datas
-    d3.json('data/nosdeputes.fr_synthese_2014-07-04.json', setup);
+    d3.json('api/synthese', setup);
 
 
 }(jQuery, d3, THREE, THREEx, _, window, 'commission_presences');
-
-
-</script>
-
-<div class="message-box">
-    <p>Name : <span id="message-box-name"></span></p>
-
-    <p>Party : <span id="message-box-party"></span></p>
-
-    <p>Value : <span id="message-box-value"></span></p>
-</div>
-
-<div class="search-box">
-    <input type="text"/>
-</div>
-
-</body>
-</html>

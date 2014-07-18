@@ -1,0 +1,23 @@
+{
+  "name": "nosdeputes",
+  "version": "0.0.0",
+  "description": "datavis tests with d3.js and three.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hllwd/dthree.js.git"
+  },
+  "author": "hllwd",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hllwd/dthree.js/issues"
+  },
+  "homepage": "https://github.com/hllwd/dthree.js",
+  "dependencies": {
+    "ejs": "^1.0.0",
+    "express": "4.6.1"
+  }
+}
