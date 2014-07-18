@@ -467,7 +467,7 @@
     };
 
     // retrieve datas
-    d3.json('data/nosdeputes.fr_synthese_2014-07-04.json', setup);
+    d3.json('api/synthese', setup);
 
 
 }(jQuery, d3, THREE, THREEx, _, window, 'commission_presences');

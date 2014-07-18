@@ -23,19 +23,19 @@ app.use(express.static(path.join(__dirname, 'public')));
 /**
  * Routes - index html page
  */
-app.get('/', routes.index);
+app.route('/').get(routes.index);
 
 /**
  * Routes - json api
  */
 // hello
-app.get('/api/hello', api.hello);
+app.route('/api/hello').get(api.hello);
 
 // deputes
-app.get('/api/deputes', api.deputes);
+app.route('/api/synthese').get(api.synthese);
 
 // picture
-app.get('/api/picture', api.picture);
+app.route('/api/picture').get(api.picture);
 
 /**
  * Launch server
