@@ -3,36 +3,36 @@
  */
 
 var express = require('express')
-    , api = require('./api')
+    , routes = require('./routes')
+    , api = require('./routes/api')
     , http = require('http')
     , path = require('path')
     , app = module.exports = express();
-
-
 
 /**
  * Configuration
  */
 // all environments
 app.set('port', process.env.PORT || 3000);
-app.use(express.logger('dev'));
-app.use(express.bodyParser());
-app.use(express.favicon());
-// router, has to be below bodyParser
-app.use(app.router);
-
-// development only
-if (app.get('env') === 'development') {
-    app.use(express.errorHandler());
-}
-
-// production only
-if (app.get('env') === 'production') {
-    // TODO
-};
+// set views
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+// assets
+app.use(express.static(path.join(__dirname, 'public')));
 
 /**
- * Routes
+ * Routes - index html page
  */
-// serve index and view partials
 app.get('/', routes.index);
+
+/**
+ * Routes - json api
+ */
+app.get('/api/hello', api.hello);
+
+/**
+ * Launch server
+ */
+http.createServer(app).listen(app.get('port'), function () {
+    console.log('Express server listening on port ' + app.get('port'));
+});

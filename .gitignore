@@ -1,5 +1,5 @@
-# bower compo
-bower_components/*
+# bower
+public/js/bower_components/*
 
 # npm
 node_modules/*
