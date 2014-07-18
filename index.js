@@ -23,7 +23,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 /**
  * Routes - index html page
  */
+// index
 app.route('/').get(routes.index);
+
+// test
+app.route('/test').get(routes.test);
 
 /**
  * Routes - json api

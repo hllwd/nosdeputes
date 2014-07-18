@@ -1,28 +1,35 @@
 {
-    "name": "nosdeputes",
-    "version": "0.0.0",
+	"name": "nosdeputes",
+	"version": "0.0.1",
 	"engines": {
 		"node": "0.10.26"
 	},
-	"description": "datavis tests with d3.js and three.js",
-    "main": "index.js",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/hllwd/dthree.js.git"
-    },
-    "author": "hllwd",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/hllwd/nosdeputes/issues"
-    },
-    "homepage": "https://github.com/hllwd/nosdeputes",
-    "dependencies": {
-        "ejs": "^1.0.0",
-        "express": "4.6.1",
-        "bower": "1.3.8"
-    },
-    "scripts": {
-        "postinstall": "./node_modules/bower/bin/bower install",
+	"description": "datavis test with d3.js and three.js",
+	"main": "index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hllwd/dthree.js.git"
+	},
+	"author": "hllwd",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/hllwd/nosdeputes/issues"
+	},
+	"homepage": "https://github.com/hllwd/nosdeputes",
+	"dependencies": {
+		"ejs": "^1.0.0",
+		"express": "4.6.1",
+		"bower": "1.3.8",
+		"gulp": "^3.8.6"
+	},
+	"scripts": {
+		"postinstall": "./node_modules/bower/bin/bower install",
 		"start": "node index.js"
-    }
+	},
+	"devDependencies": {
+		"gulp": "^3.8.6",
+		"gulp-rename": "^1.2.0",
+		"gulp-concat": "^2.3.3",
+		"gulp-uglify": "^0.3.1"
+	}
 }
