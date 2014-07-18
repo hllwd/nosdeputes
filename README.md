@@ -13,6 +13,8 @@ A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js]
 
     node index.js
 
+and then open the [index page]
+
 ## Dependencies
 
 * [d3.js] - for data driven documents
@@ -44,3 +46,4 @@ A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js]
 [d3.js]: http://d3js.org
 [three.js]: http://threejs.org
 [commented hello world]: https://github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/HelloWorld.html
+[index page]: http://localhost:3000
