@@ -106,8 +106,8 @@
         // add the camera to the scene at the default position (0,0,0)
         scene.add(camera);
         // so pull it back
-        camera.position.set(-800, 800, -800);
-        // and set the angle towards the scene origin
+		camera.position.set(-400, 400, -400);
+		// and set the angle towards the scene origin
         camera.lookAt(scene.position);
 
         // renderer
