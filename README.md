@@ -2,7 +2,7 @@
 
 A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js]
 
-![Hemicycle](https://raw2.github.com/hllwd/dthree.js/master/nosdeputes/doc/img/printscreen.png)
+![Hemicycle](https://raw2.github.com/hllwd/nosdeputes/master/doc/img/printscreen.png)
 
 ## Installation
 
