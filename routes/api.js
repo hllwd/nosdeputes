@@ -42,15 +42,3 @@ exports.synthese = function(req, res){
         console.log('got error on request to nodeputes.fr : ' + e.message);
     });
 };
-
-/**
- *
- * @param req
- * @param res
- */
-exports.picture = function(req, res){
-    res.json({
-        hello: 'world'
-    });
-};
-

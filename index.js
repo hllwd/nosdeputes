@@ -34,9 +34,6 @@ app.route('/api/hello').get(api.hello);
 // deputes
 app.route('/api/synthese').get(api.synthese);
 
-// picture
-app.route('/api/picture').get(api.picture);
-
 /**
  * Launch server
  */

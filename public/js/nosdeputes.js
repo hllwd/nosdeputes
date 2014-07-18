@@ -31,7 +31,7 @@
     var positions = {
         ECOLO: 1, GDR: 0, NI: 6, RRDP: 3, SRC: 2, UDI: 4, UMP: 5 };
     // message box
-    var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue;
+    var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue, $messageBoxImg;
     // select box
     var $autocomplete;
 
@@ -41,6 +41,7 @@
         $messageBoxName = $messageBox.find('#message-box-name');
         $messageBoxParty = $messageBox.find('#message-box-party');
         $messageBoxValue = $messageBox.find('#message-box-value');
+        $messageBoxImg = $messageBox.find('img');
         $autocomplete = $('.search-box input');
     };
 
@@ -441,6 +442,7 @@
     };
 
     function displaySelectedDepute(depute) {
+        $messageBoxImg.attr('src', 'http://www.nosdeputes.fr/depute/photo/' + depute.slug + '/100');
         $messageBoxName.html(depute.nom);
         $messageBoxParty.html(depute.parti_ratt_financier);
         $messageBoxValue.html(depute[sortAttribute]);
