@@ -32,8 +32,8 @@ A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js]
 * add a transition on criterion change : OK
 * display max and min, mean, median, ... for each criterion
 * add a search box : OK
-* branch API with a server side
-    * enhance selected depute's display : picture, ...
+* branch API with a server side : OK
+    * enhance selected depute's display : picture, ... : OK
     * display more information
 * fix "Matrix3.getInverse(): can't invert matrix, determinant is 0"
 * fix M key display full screen
