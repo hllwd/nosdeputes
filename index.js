@@ -12,12 +12,12 @@ var express = require('express')
 /**
  * Configuration
  */
-// all environments
+// set port
 app.set('port', process.env.PORT || 3000);
-// set views
+// set views with ejs
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
-// assets
+// set assets dir
 app.use(express.static(path.join(__dirname, 'public')));
 
 /**
@@ -28,7 +28,14 @@ app.get('/', routes.index);
 /**
  * Routes - json api
  */
+// hello
 app.get('/api/hello', api.hello);
+
+// deputes
+app.get('/api/deputes', api.deputes);
+
+// picture
+app.get('/api/picture', api.picture);
 
 /**
  * Launch server
