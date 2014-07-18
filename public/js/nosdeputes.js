@@ -464,7 +464,7 @@
             20,
             4);
         outlineMesh = new th.Mesh(outlineGeometry, outlineMaterial);
-        outlineMesh.position = object.position;
+        outlineMesh.position.set(object.position.x, object.position.y,object.position.z);
         scene.add(outlineMesh);
     };
 
