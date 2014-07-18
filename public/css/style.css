@@ -27,10 +27,11 @@ canvas {
     position: fixed;
     padding: 10px;
     font: 11px 'Lucida Grande', sans-serif;
-    display: none;
     width: 245px;
+    opacity: 0;
     top: 85px;
     right: 0px;
+    transition: opacity .5s;
 }
 
 /* search box */

@@ -442,11 +442,15 @@
         $messageBoxName.html(depute.nom);
         $messageBoxParty.html(depute.parti_ratt_financier);
         $messageBoxValue.html(depute[sortAttribute]);
-        $messageBox.show();
+        $messageBox.css({
+            'opacity': 1
+        });
     };
 
     function unselectSelectedDepute() {
-        $messageBox.hide();
+        $messageBox.css({
+            'opacity': 0
+        });
         scene.remove(outlineMesh);
     };
 
