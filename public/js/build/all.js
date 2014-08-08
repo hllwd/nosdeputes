@@ -1795,7 +1795,7 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
 
         // axes
         axes = new th.AxisHelper(100);
-        scene.add(axes);
+        // scene.add(axes);
 
         // sky
         // ! make sure the camera's far is big enough to render the sky
