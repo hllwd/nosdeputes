@@ -1,7 +1,7 @@
 # Nos députés
 
-A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js]
-[the application is available here]
+A WebGL attempt using the [API] of [Regards Citoyens] with [three.js] & [d3.js].
+the application is available on [heroku] 
 
 ![Hemicycle](https://raw2.github.com/hllwd/nosdeputes/master/doc/img/printscreen.png)
 
@@ -48,4 +48,4 @@ and then open the [index page]
 [three.js]: http://threejs.org
 [commented hello world]: https://github.com/stemkoski/stemkoski.github.com/blob/master/Three.js/HelloWorld.html
 [index page]: http://localhost:3000
-[the application is available here]: http://nosdeputes.herokuapp.com
+[heroku]: http://nosdeputes.herokuapp.com
