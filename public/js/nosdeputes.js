@@ -507,13 +507,16 @@
             })
         ];
 
-        var rectMinMax = gMinMax.selectAll('.rect-min-max').data(datasMinMax);
+        var rectMinMax = gMinMax.selectAll('.rect-min-max').data(datasMinMax, function(d){
+            return d.id;
+        });
         var getWidthRectMinMax = function(d,i){
             return scaleYSortAttribute.rangeRound([0, w])(parseInt(d[sortAttribute]));
         };
         var getYRectParties = function(d,i){
             return scaleY(i);
         };
+        rectMinMax.exit().remove();
         rectMinMax.transition().duration(dur)
             .attr('width', getWidthRectMinMax)
             .attr('y', getYRectParties)
@@ -530,7 +533,9 @@
                 return colors[p.groupe_sigle].toString(16);
             });
 
-        var labelMinMax = gMinMax.selectAll('.label-min-max').data(datasMinMax);
+        var labelMinMax = gMinMax.selectAll('.label-min-max').data(datasMinMax, function(d){
+            return d.id;
+        });
         var isRectBigEnoughMinMax = function(p,i){
             return scaleYSortAttribute.rangeRound([0, w])(parseInt(p[sortAttribute])) > 120;
         };
@@ -554,6 +559,7 @@
         var getTextLabelMinMax = function(p,i){
             return p.nom + ' : ' + parseInt(p[sortAttribute]);
         };
+        labelMinMax.exit().remove();
         labelMinMax.transition().duration(dur)
             .attr('x', getXLabelMinMax)
             .attr('y', getYLabelMinMax)
