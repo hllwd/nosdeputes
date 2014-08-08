@@ -1662,6 +1662,13 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
     var $messageBox, $messageBoxName, $messageBoxParty, $messageBoxValue, $messageBoxImg;
     // select box
     var $autocomplete;
+    // display current criterion
+    var $criterion;
+    // stats panel
+    var $statsPanel;
+    var d3statsSvg;
+    var gParties;
+    var gMinMax;
 
     // dom ready callback
     function onDomReady() {
@@ -1671,6 +1678,29 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
         $messageBoxValue = $messageBox.find('#message-box-value');
         $messageBoxImg = $messageBox.find('img');
         $autocomplete = $('.search-box input');
+        $criterion = $('.criterion');
+        $statsPanel = $('.stats-panel');
+        d3statsSvg = d3.select('.stats-panel').append('svg')
+            .attr('class', 'svg-stats-panel');
+
+        gMinMax = d3statsSvg.append('g')
+            .attr('class', 'g-minmax');
+        gParties = d3statsSvg.append('g')
+            .attr('class', 'g-parties')
+            .attr('transform', 'translate(0, 150)');
+
+        gMinMax.append('text')
+            .attr('class', 'title-label')
+            .attr('x', 10)
+            .attr('y', 20)
+            .text('MIN / MAX : ');
+
+        gParties.append('text')
+            .attr('class', 'title-label')
+            .attr('x', 10)
+            .attr('y', 20)
+            .text('MOYENNES PAR PARTIES : ');
+
     };
 
     // setup scene
@@ -1734,7 +1764,7 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
         // add the camera to the scene at the default position (0,0,0)
         scene.add(camera);
         // so pull it back
-		camera.position.set(-400, 400, -400);
+		camera.position.set(-600, 600, -600);
 		// and set the angle towards the scene origin
         camera.lookAt(scene.position);
 
@@ -1765,7 +1795,7 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
 
         // axes
         axes = new th.AxisHelper(100);
-        // scene.add(axes);
+        scene.add(axes);
 
         // sky
         // ! make sure the camera's far is big enough to render the sky
@@ -1785,6 +1815,7 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
         criterionController = gui.add(controlInstance, 'criterion', controlData);
         gui.open();
         criterionController.onFinishChange(function (value) {
+            $criterion.html(value);
             // unselect selected depute
             unselectSelectedDepute();
             // set sort attribute
@@ -1792,6 +1823,8 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
             // compute datas
             setupData();
         });
+
+        $criterion.html(sortAttribute);
 
         win.addEventListener('click', onMouseClick, false);
 
@@ -1835,8 +1868,7 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
         scaleYSortAttribute = d3.scale.linear()
             .domain([0, d3.max(deputes, function (d) {
                 return parseInt(d[sortAttribute]);
-            })])
-            .rangeRound([0, 100]);
+            })]);
         // we sort deputes
         deputes.sort(function (a, b) {
             if (a.groupe_sigle !== b.groupe_sigle) {
@@ -1868,6 +1900,8 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
             .rangeRound([-minRadius / 2, minRadius / 2]);
         // reset animation
         resetAnimation();
+        // draw svg
+        drawStatsPanel();
     };
 
     function setupHemicycle() {
@@ -1960,7 +1994,7 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
                 currentIndice = iLine * maxCol + iCol;
                 if (currentIndice < deputes.length) {
                     currentDepute = deputes[currentIndice];
-                    currentY = scaleYSortAttribute(currentDepute[sortAttribute]);
+                    currentY = scaleYSortAttribute.rangeRound([0, 100])(currentDepute[sortAttribute]);
                     currentCol = scaleRadius(iCol);
                     currentLine = scaleAngle(iLine);
                     currentPoint = [
@@ -1992,7 +2026,7 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
         var currentZ;
 
         parties.forEach(function (currentParty, ind) {
-            currentY = scaleYSortAttribute(currentParty.value);
+            currentY = scaleYSortAttribute.rangeRound([0, 100])(currentParty.value);
             currentZ = scaleZParty(ind);
             currentGeometry = new th.CylinderGeometry(6, 6, currentY, 20, 4);
             currentMaterial = new th.MeshLambertMaterial({ color: colors[currentParty.party] });
@@ -2016,6 +2050,151 @@ b);e.bind(this.domElement,"transitionend",b);e.bind(this.domElement,"oTransition
         draw();
         render();
         update();
+    };
+
+    function drawStatsPanel(){
+        var w = $statsPanel.width();
+        var h = $statsPanel.height();
+        var dur = 500;
+        var getKeyForParties = function(p){
+            return p.party;
+        };
+        var scaleY = d3.scale.linear()
+            .domain([0, parties.length])
+            .range([50, 250]);
+        var sortParties = function(p1, p2){
+            return p2.value - p1.value;
+        };
+
+        parties.sort(sortParties);
+
+        var rectParties = gParties.selectAll('.rect-party').data(parties, getKeyForParties);
+        var getWidthRectParties = function(p,i){
+            return scaleYSortAttribute.rangeRound([0, w])(p.value);
+        };
+        var getYRectParties = function(p,i){
+            return scaleY(i);
+        };
+        rectParties.transition().duration(dur)
+            .attr('width', getWidthRectParties)
+            .attr('y', getYRectParties);
+        rectParties.enter().append('rect')
+            .attr('class', 'rect-party')
+            .attr('x', 10)
+            .attr('width', getWidthRectParties)
+            .attr('y', getYRectParties)
+            .attr('height', 20)
+            .style('fill', function(p,i){
+                return colors[p.party].toString(16);
+            });
+
+
+        var labelParties = gParties.selectAll('.label-party').data(parties, getKeyForParties);
+        var isRectBigEnough = function(p,i){
+            return scaleYSortAttribute.rangeRound([0, w])(p.value) > 85;
+        };
+        var getFillLabelParties = function(p,i){
+            if(isRectBigEnough(p,i)){
+                return 'white';
+            }else {
+                return 'black';
+            }
+        };
+        var getXLabelParties = function(p,i){
+            if(isRectBigEnough(p,i)){
+                return 20;
+            }else {
+                return scaleYSortAttribute.rangeRound([0, w])(p.value) + 20;
+            }
+        };
+        var getYLabelParties = function(p,i){
+            return scaleY(i) + 20/2;
+        };
+        var getTextLabelParties = function(p,i){
+            return p.party + ' : ' + p.value;
+        };
+        labelParties.transition().duration(dur)
+            .attr('x', getXLabelParties)
+            .attr('y', getYLabelParties)
+            .text(getTextLabelParties)
+            .style('fill', getFillLabelParties);
+        labelParties.enter().append('text')
+            .attr('class', 'label-party')
+            .attr('x', getXLabelParties)
+            .attr('y', getYLabelParties)
+            .text(getTextLabelParties)
+            .style('fill', getFillLabelParties);
+
+
+        var datasMinMax = [
+            _ .min(deputes, function(dep){
+                return parseInt(dep[sortAttribute]);
+            }),
+            _ .max(deputes, function(dep){
+                return parseInt(dep[sortAttribute]);
+            })
+        ];
+
+        var rectMinMax = gMinMax.selectAll('.rect-min-max').data(datasMinMax);
+        var getWidthRectMinMax = function(d,i){
+            return scaleYSortAttribute.rangeRound([0, w])(parseInt(d[sortAttribute]));
+        };
+        var getYRectParties = function(d,i){
+            return scaleY(i);
+        };
+        rectMinMax.transition().duration(dur)
+            .attr('width', getWidthRectMinMax)
+            .attr('y', getYRectParties)
+            .style('fill', function(p,i){
+                return colors[p.groupe_sigle].toString(16);
+            });
+        rectMinMax.enter().append('rect')
+            .attr('class', 'rect-min-max')
+            .attr('x', 10)
+            .attr('width', getWidthRectMinMax)
+            .attr('y', getYRectParties)
+            .attr('height', 20)
+            .style('fill', function(p,i){
+                return colors[p.groupe_sigle].toString(16);
+            });
+
+        var labelMinMax = gMinMax.selectAll('.label-min-max').data(datasMinMax);
+        var isRectBigEnoughMinMax = function(p,i){
+            return scaleYSortAttribute.rangeRound([0, w])(parseInt(p[sortAttribute])) > 120;
+        };
+        var getFillLabelMinMax = function(p,i){
+            if(isRectBigEnoughMinMax(p,i)){
+                return 'white';
+            }else {
+                return 'black';
+            }
+        };
+        var getXLabelMinMax = function(p,i){
+            if(isRectBigEnoughMinMax(p,i)){
+                return 20;
+            }else {
+                return scaleYSortAttribute.rangeRound([0, w])(parseInt(p[sortAttribute])) + 20;
+            }
+        };
+        var getYLabelMinMax = function(p,i){
+            return scaleY(i) + 20/2;
+        };
+        var getTextLabelMinMax = function(p,i){
+            return p.nom + ' : ' + parseInt(p[sortAttribute]);
+        };
+        labelMinMax.transition().duration(dur)
+            .attr('x', getXLabelMinMax)
+            .attr('y', getYLabelMinMax)
+            .text(getTextLabelMinMax)
+            .style('fill', getFillLabelMinMax);
+        labelMinMax.enter().append('text')
+            .attr('class', 'label-min-max')
+            .attr('x', getXLabelMinMax)
+            .attr('y', getYLabelMinMax)
+            .text(getTextLabelMinMax)
+            .style('fill', getFillLabelMinMax);
+        
+
     };
 
     function update() {
